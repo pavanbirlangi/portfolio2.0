@@ -2,30 +2,16 @@
 
 import { motion } from "framer-motion";
 import { memo } from "react";
+import { ScrollReveal } from "@/components/lightswind/scroll-reveal";
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.18,
-    },
-  },
+const simpleVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
 };
-const headingVariants = {
-  hidden: { opacity: 0, y: 40, filter: 'drop-shadow(0 0 0 #8a2be2)' },
-  show: { opacity: 1, y: 0, filter: 'drop-shadow(0 0 16px #8a2be2)' },
-};
-const leftVariants = {
-  hidden: { opacity: 0, x: -40, filter: 'blur(8px)' },
-  show: { opacity: 1, x: 0, filter: 'blur(0px)' },
-};
+
 const rightVariants = {
   hidden: { opacity: 0, x: 40, scale: 0.96, filter: 'drop-shadow(0 0 0 #00bcd4)' },
   show: { opacity: 1, x: 0, scale: 1, filter: 'drop-shadow(0 0 24px #00bcd4)' },
-};
-const buttonVariants = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1 },
 };
 
 const ProfileImage = memo(() => (
@@ -59,67 +45,90 @@ const ProfileImage = memo(() => (
 
 export default function About() {
   return (
-    <motion.section
+    <section
       className="w-full px-6 md:px-16 bg-transparent text-white relative overflow-visible"
       id="about"
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.5 }}
     >
-      {/* Section-wide background gradients/overlays (if any) */}
-      {/* Example: <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/80 z-0 pointer-events-none" /> */}
-
       <div className="relative z-10">
-      <motion.h2
-          variants={headingVariants}
-          transition={{ type: 'spring', stiffness: 80, damping: 18, duration: 0.8 }}
-          className="text-3xl md:text-7xl font-bold font-mono text-center mb-12"
-      >
-        About Me
-      </motion.h2>
+        <ScrollReveal
+          size="xl"
+          align="center"
+          variant="default"
+          containerClassName="mb-12"
+          textClassName="text-white"
+        >
+          About Me
+        </ScrollReveal>
 
         <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12 md:gap-24 pl-10 pr-10 overflow-visible">
-        <motion.div
-          className="flex-1 text-center md:text-left"
-            variants={leftVariants}
+          <div className="flex-1 text-center md:text-left">
+            <ScrollReveal
+              size="md"
+              align="left"
+              variant="muted"
+              containerClassName="mb-2"
+            >
+              Hello, I'm
+            </ScrollReveal>
+            
+            <ScrollReveal
+              size="xl"
+              align="left"
+              variant="default"
+              containerClassName="mb-4 pl-6 font-mono font-bold"
+              textClassName="text-white"
+            >
+              Pavan
+            </ScrollReveal>
+            
+            <ScrollReveal
+              size="md"
+              align="left"
+              variant="muted"
+              containerClassName="max-w-xl mx-auto md:mx-0 mb-8"
+            >
+              I'm a freelance web developer and Shopify expert, specializing in eCommerce and custom web solutions. From sleek Shopify stores to dynamic websites, I create seamless, high-converting user experiences.
+            </ScrollReveal>
+
+            <motion.div 
+              className="flex justify-center md:justify-start gap-4 flex-wrap"
+              variants={simpleVariants}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+            >
+              <motion.a
+                href="/resume.pdf"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="backdrop-blur-md bg-white/10 border border-white/20 text-white text-sm md:text-base font-sans px-6 py-3 rounded-full hover:bg-white/20 transition-all shadow-sm"
+              >
+                View Resume
+              </motion.a>
+              <motion.a
+                href="#projects"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="backdrop-blur-md bg-white/10 border border-white/20 text-white text-sm md:text-base font-sans px-6 py-3 rounded-full hover:bg-white/20 transition-all shadow-sm"
+              >
+                View Projects
+              </motion.a>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="flex-1"
+            variants={rightVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
             transition={{ type: 'spring', stiffness: 80, damping: 18, duration: 0.8 }}
           >
-            <motion.p className="text-lg md:text-xl text-gray-300 mb-2" variants={buttonVariants} transition={{ type: 'spring', stiffness: 120, damping: 16, duration: 0.5 }}>Hello, I'm</motion.p>
-            <motion.h3 className="text-4xl md:text-6xl font-bold font-mono mb-4 pl-6" variants={buttonVariants} transition={{ type: 'spring', stiffness: 120, damping: 16, duration: 0.5 }}>Pavan</motion.h3>
-            <motion.p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-8" variants={buttonVariants} transition={{ type: 'spring', stiffness: 120, damping: 16, duration: 0.5 }}>
-              I'm a freelance web developer and Shopify expert, specializing in eCommerce and custom web solutions. From sleek Shopify stores to dynamic websites, I create seamless, high-converting user experiences.
-            </motion.p>
-
-            <motion.div className="flex justify-center md:justify-start gap-4 flex-wrap" variants={buttonVariants} transition={{ type: 'spring', stiffness: 120, damping: 16, duration: 0.5 }}>
-            <motion.a
-              href="/resume.pdf"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="backdrop-blur-md bg-white/10 border border-white/20 text-white text-sm md:text-base font-sans px-6 py-3 rounded-full hover:bg-white/20 transition-all shadow-sm"
-            >
-              View Resume
-            </motion.a>
-            <motion.a
-              href="#projects"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="backdrop-blur-md bg-white/10 border border-white/20 text-white text-sm md:text-base font-sans px-6 py-3 rounded-full hover:bg-white/20 transition-all shadow-sm"
-            >
-              View Projects
-            </motion.a>
-            </motion.div>
-        </motion.div>
-
-        <motion.div
-          className="flex-1"
-            variants={rightVariants}
-            transition={{ type: 'spring', stiffness: 80, damping: 18, duration: 0.8 }}
-        >
-          <ProfileImage />
-        </motion.div>
+            <ProfileImage />
+          </motion.div>
+        </div>
       </div>
-      </div>
-    </motion.section>
+    </section>
   );
 }

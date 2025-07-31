@@ -41,48 +41,15 @@ const CardSticky = React.forwardRef<HTMLDivElement, CardStickyProps>(
     },
     ref
   ) => {
-    const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-
-    React.useEffect(() => {
-      const checkScreenSize = () => {
-        const width = window.innerWidth;
-        if (width < 768) {
-          setScreenSize('mobile');
-        } else if (width < 1024) {
-          setScreenSize('tablet');
-        } else {
-          setScreenSize('desktop');
-        }
-      };
-      
-      checkScreenSize();
-      window.addEventListener('resize', checkScreenSize);
-      
-      return () => window.removeEventListener('resize', checkScreenSize);
-    }, []);
-
-    // Responsive positioning
-    let y: number;
-    switch (screenSize) {
-      case 'mobile':
-        y = index * (incrementY * 0.4);
-        break;
-      case 'tablet':
-        y = index * (incrementY * 0.7);
-        break;
-      default:
-        y = index * incrementY;
-    }
-
-    const baseOffset = screenSize === 'mobile' ? 50 : screenSize === 'tablet' ? 120 : 200;
-    const z = index * incrementZ;
+    const y = index * incrementY
+    const z = index * incrementZ
 
     return (
       <motion.div
         ref={ref}
         layout="position"
         style={{
-          top: y + baseOffset,
+          top: y + 104, // 96px = 6rem = 24 * 4px (top-24 equivalent)
           z,
           backfaceVisibility: "hidden",
           ...style,
