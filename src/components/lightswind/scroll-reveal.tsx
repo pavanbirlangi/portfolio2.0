@@ -82,20 +82,22 @@ export function ScrollReveal({
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, {
     amount: threshold,
-    once: false
+    once: true, // Changed to true to prevent constant re-evaluation
+    margin: "0px 0px -100px 0px" // Trigger animation earlier for smoother experience
   });
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
+  // Removed useScroll and rotation transform to reduce computation
+  // const { scrollYProgress } = useScroll({
+  //   target: containerRef,
+  //   offset: ["start end", "end start"]
+  // });
 
   // Transform rotation based on scroll
-  const rotation = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    [baseRotation, 0, 0]
-  );
+  // const rotation = useTransform(
+  //   scrollYProgress,
+  //   [0, 0.5, 1],
+  //   [baseRotation, 0, 0]
+  // );
 
   // Split text into words and spaces, ensuring each part is an object
   const splitText = useMemo(() => { // Using useMemo is good here
@@ -119,7 +121,7 @@ export function ScrollReveal({
       opacity: 1,
       transition: {
         staggerChildren: staggerDelay,
-        delayChildren: 0.1,
+        delayChildren: 0.05, // Reduced delay for faster start
       },
     },
   };
@@ -128,17 +130,18 @@ export function ScrollReveal({
     hidden: {
       opacity: baseOpacity,
       filter: enableBlur ? `blur(${blurStrength}px)` : "blur(0px)",
-      y: 20,
+      y: 15, // Reduced from 20 for subtler movement
     },
     visible: {
       opacity: 1,
       filter: "blur(0px)",
       y: 0,
       transition: {
-        // Removed `type: "spring"` here. Framer Motion infers "spring"
-        // when damping, stiffness, or mass are present.
-        ...springConfig,
-        duration, // This is a common property for all transition types
+        // Optimized spring config for better performance
+        type: "spring" as const,
+        damping: 30, // Increased for less bouncy, faster animation
+        stiffness: 120, // Increased for quicker response
+        mass: 0.8, // Reduced for lighter feeling
       },
     },
   };
@@ -146,7 +149,6 @@ export function ScrollReveal({
   return (
     <motion.div
       ref={containerRef}
-      style={{ rotate: rotation }}
       className={cn(
         "my-5 transform-gpu",
         containerClassName
@@ -173,7 +175,7 @@ export function ScrollReveal({
             // Render words as motion.span for animation
             <motion.span
               key={`word-${item.originalIndex}`} // Use originalIndex for stable keys
-              className="inline-block"
+              className="inline-block will-change-transform"
               variants={wordVariants}
             >
               {item.value}

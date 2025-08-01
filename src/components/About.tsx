@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { memo } from "react";
-import { ScrollReveal } from "@/components/lightswind/scroll-reveal";
+import ScrollReveal from "@/components/blocks/scroll-text-reveal";
 
 const simpleVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -51,11 +51,12 @@ export default function About() {
     >
       <div className="relative z-10">
         <ScrollReveal
-          size="xl"
-          align="center"
-          variant="default"
-          containerClassName="mb-12"
-          textClassName="text-white"
+            baseOpacity={0}
+            enableBlur={true}
+            baseRotation={5}
+            blurStrength={10}
+          containerClassName="mb-12 text-center"
+          textClassName="text-white font-fira font-bold text-3xl md:text-7xl"
         >
           About Me
         </ScrollReveal>
@@ -63,29 +64,34 @@ export default function About() {
         <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12 md:gap-24 pl-10 pr-10 overflow-visible">
           <div className="flex-1 text-center md:text-left">
             <ScrollReveal
-              size="md"
-              align="left"
-              variant="muted"
-              containerClassName="mb-2"
+                baseOpacity={0}
+                enableBlur={true}
+                baseRotation={5}
+                blurStrength={10}
+              containerClassName="mb-2 text-left"
+              textClassName="text-gray-300 text-lg md:text-xl"
             >
               Hello, I'm
             </ScrollReveal>
             
             <ScrollReveal
-              size="xl"
-              align="left"
-              variant="default"
-              containerClassName="mb-4 pl-6 font-mono font-bold"
-              textClassName="text-white"
+                baseOpacity={0}
+                enableBlur={true}
+                baseRotation={5}
+                blurStrength={10}
+              containerClassName="mb-4 pl-6 text-left"
+              textClassName="text-white font-fira font-bold text-4xl md:text-6xl"
             >
               Pavan
             </ScrollReveal>
             
             <ScrollReveal
-              size="md"
-              align="left"
-              variant="muted"
-              containerClassName="max-w-xl mx-auto md:mx-0 mb-8"
+                baseOpacity={0}
+                enableBlur={true}
+                baseRotation={5}
+                blurStrength={10}
+              containerClassName="max-w-xl mx-auto md:mx-0 mb-8 text-left"
+              textClassName="font-sans text-gray-400 text-lg md:text-xl"
             >
               I'm a freelance web developer and Shopify expert, specializing in eCommerce and custom web solutions. From sleek Shopify stores to dynamic websites, I create seamless, high-converting user experiences.
             </ScrollReveal>

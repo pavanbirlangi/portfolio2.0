@@ -47,10 +47,10 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
             setTimeout(() => {
               setLoading(false);
               onFinish();
-            }, 600);
-          }, 1000);
-        }, 300);
-      }, 500); // expand duration
+            }, 400); // Reduced from 600ms to 300ms
+          }, 600); // Reduced from 1000ms to 400ms
+        }, 180); // Reduced from 300ms to 150ms
+      }, 500); // Reduced from 500ms to 200ms
     }, totalDuration);
 
     return () => {
@@ -69,8 +69,8 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
           className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto"
           initial={{ opacity: 1 }}
           animate={{ opacity: fadeBackground ? 0 : 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.6 } }}
-          transition={{ duration: 0.6 }}
+          exit={{ opacity: 0, transition: { duration: 0.3 } }}
+          transition={{ duration: 0.3 }}
           style={{ backgroundColor: fadeBackground ? "transparent" : "white" }}
         >
           {/* Loading Bar */}
