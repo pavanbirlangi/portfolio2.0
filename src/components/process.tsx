@@ -35,15 +35,15 @@ const PROCESS_PHASES = [
 
 const Process = () => {
   return (
-    <div className="container min-h-svh place-content-center bg-transparent px-6 pb-200 text-gray-300 xl:px-12">
+    <div className="container min-h-svh place-content-center bg-transparent px-6 pb-24 text-gray-300 xl:px-12">
       <div className="grid md:grid-cols-2 md:gap-8 xl:gap-12">
         <div className="left-0 top-0 md:sticky md:top-24 md:h-fit md:py-12">
-          <h5 className=" text-xs uppercase tracking-wide">our process</h5>
-          <h2 className="mb-6 mt-4 text-4xl font-bold tracking-tight">
+          <h5 className="text-xs uppercase tracking-wide font-sans">our process</h5>
+          <h2 className="mb-6 mt-4 text-4xl font-bold tracking-tight font-fira">
             Planning your{" "}
             <span className="text-indigo-500">project development</span> journey
           </h2>
-          <p className="max-w-prose text-sm">
+          <p className="max-w-prose text-sm font-sans">
             Our journey begins with a deep dive into your vision. In the
             Discovery phase, we engage in meaningful conversations to grasp your
             brand identity, goals, and the essence you want to convey. This
@@ -58,15 +58,15 @@ const Process = () => {
               className="rounded-2xl border p-8 shadow-md backdrop-blur-md"
             >
               <div className="flex items-center justify-between gap-4">
-                <h2 className="my-6 text-2xl font-bold tracking-tighter">
+                <h2 className="my-6 text-2xl font-bold tracking-tighter font-fira">
                   {phase.title}
                 </h2>
-                <h3 className="text-2xl font-bold text-indigo-500">
+                <h3 className="text-2xl font-bold text-indigo-500 font-fira">
                   {String(index + 1).padStart(2, "0")}
                 </h3>
               </div>
 
-              <p className="text-gray-300">{phase.description}</p>
+              <p className="text-gray-300 font-sans">{phase.description}</p>
             </CardSticky>
           ))}
         </ContainerScroll>

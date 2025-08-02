@@ -23,23 +23,59 @@ const HorizontalScrollSection = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    // Check if we're on mobile - if so, disable horizontal scroll
-    const isMobile = window.innerWidth < 768;
-    
-    if (isMobile) {
-      // For mobile, we'll just use regular scroll without pinning
-      return;
-    }
-
-    // Set up GSAP and ScrollTrigger (no separate Lenis instance here)
+    // Set up GSAP and ScrollTrigger (Lenis is handled globally)
     gsap.registerPlugin(ScrollTrigger);
 
     if (!sliderRef.current) return;
     const slider = sliderRef.current;
-
-    // Wait a bit for everything to be rendered
-    const timer = setTimeout(() => {
-      // The scroll distance should allow the last image to be fully visible
+    
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // Mobile: Disable GSAP, enable native horizontal scrolling
+      slider.style.overflowX = 'scroll';
+      slider.style.overflowY = 'hidden';
+      slider.style.scrollbarWidth = 'none'; // Firefox
+      (slider.style as any).msOverflowStyle = 'none'; // IE/Edge
+      slider.style.scrollBehavior = 'smooth';
+      
+      // Prevent vertical scroll interference
+      slider.style.touchAction = 'pan-x pinch-zoom';
+      
+      // Hide scrollbar and add momentum scrolling
+      const styleSheet = document.createElement('style');
+      styleSheet.textContent = `
+        .mobile-horizontal-scroll::-webkit-scrollbar {
+          display: none;
+        }
+        .mobile-horizontal-scroll {
+          -webkit-overflow-scrolling: touch;
+          scroll-snap-type: x mandatory;
+        }
+        .mobile-scroll-card {
+          scroll-snap-align: center;
+        }
+      `;
+      document.head.appendChild(styleSheet);
+      
+      slider.classList.add('mobile-horizontal-scroll');
+      
+      // Add scroll snap to cards
+      const cards = slider.querySelectorAll('.scroll-card');
+      cards.forEach(card => {
+        (card as HTMLElement).classList.add('mobile-scroll-card');
+      });
+      
+      return () => {
+        if (document.head.contains(styleSheet)) {
+          document.head.removeChild(styleSheet);
+        }
+      };
+    } else {
+      // Desktop: Use GSAP horizontal scroll animation
+      const firstCard = slider.querySelector('.scroll-card');
+      const cardWidth = firstCard ? (firstCard as HTMLElement).offsetWidth : 0;
       const totalWidth = slider.scrollWidth - window.innerWidth;
 
       let horizontalScroll = gsap.to(slider, {
@@ -52,44 +88,58 @@ const HorizontalScrollSection = () => {
           start: 'center center',
           end: () => `+=${totalWidth}`,
           invalidateOnRefresh: true,
-          refreshPriority: -1,
         },
       });
 
       return () => {
         horizontalScroll.kill();
+        ScrollTrigger.killAll();
       };
-    }, 100);
-
-    // Cleanup function
-    return () => {
-      clearTimeout(timer);
-      ScrollTrigger.getAll().forEach(trigger => {
-        if (trigger.trigger === slider) {
-          trigger.kill();
-        }
-      });
-    };
+    }
   }, []);
 
   return (
-    <div className="relative bg-transparent text-white mt-10 md:mt-20">
+    <div className="relative bg-transparent text-white mt-20">
       {/* SECTION HEADER */}
-      <div className="container mx-auto px-4 md:px-6 pt-12 md:pt-24 pb-8 md:pb-12 lg:pt-32 lg:pb-16">
-        <h2 className="mb-4 text-3xl md:text-5xl lg:text-7xl font-bold text-center md:text-left">We're Known For</h2>
-        <p className="max-w-xl text-base md:text-lg text-neutral-300 text-center md:text-left mx-auto md:mx-0">
+      <div className="container mx-auto px-6 pt-24 pb-12 md:pt-32 md:pb-16">
+        <h2 className="mb-4 text-5xl font-bold md:text-7xl">We're Known For</h2>
+        <p className="max-w-xl text-lg text-neutral-300">
           Building high-performance websites that are specifically designed to
           showcase your unique style of work and boost client leads.
         </p>
       </div>
 
-      {/* HORIZONTAL SCROLL CONTAINER - Desktop */}
-      <div ref={componentRef} className="hidden md:block">
-        <div ref={sliderRef} className="flex h-[90vh] w-max items-center space-x-12 px-8 md:space-x-20 md:px-20">
+      {/* HORIZONTAL SCROLL CONTAINER */}
+      <div ref={componentRef} className="relative">
+        {/* Mobile scroll hint */}
+        <div className="md:hidden mb-4 flex justify-center">
+          <div className="flex items-center gap-2 text-neutral-400 text-sm">
+            <span>Swipe horizontally to explore</span>
+            <svg width="20" height="12" viewBox="0 0 20 12" fill="none" className="animate-pulse">
+              <path d="M1 6h18m-6-5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        
+        {/* Desktop: Standard flex layout | Mobile: Horizontal scroll container */}
+        <div 
+          ref={sliderRef} 
+          className="
+            flex h-[90vh] items-center
+            md:w-max md:space-x-20 md:px-20
+            overflow-x-auto md:overflow-x-visible
+            gap-6 px-6 md:gap-0 md:px-0
+            snap-x snap-mandatory md:snap-none
+          "
+        >
           {projectImages.map((src, index) => (
             <div
               key={index}
-              className="scroll-card h-[70vh] w-[90vw] flex-shrink-0 overflow-hidden rounded-2xl shadow-2xl md:h-[80vh] md:w-[60vw]"
+              className="
+                scroll-card flex-shrink-0 overflow-hidden rounded-2xl shadow-2xl
+                h-[70vh] w-[85vw] sm:w-[75vw] md:h-[80vh] md:w-[60vw]
+                snap-center md:snap-align-none
+              "
             >
               <Image
                 src={src}
@@ -97,39 +147,14 @@ const HorizontalScrollSection = () => {
                 width={1600}
                 height={1200}
                 className="h-full w-full bg-neutral-800 object-cover"
+                // Remember to replace with real images, or this will look blank
               />
             </div>
           ))}
         </div>
       </div>
-
-      {/* MOBILE GRID VIEW */}
-      <div className="md:hidden px-4 pb-8">
-        <div className="flex overflow-x-auto gap-4 pb-4 mobile-scroll" style={{ scrollSnapType: 'x mandatory' }}>
-          {projectImages.map((src, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 h-[50vh] w-[85vw] overflow-hidden rounded-2xl shadow-2xl"
-              style={{ scrollSnapAlign: 'start' }}
-            >
-              <Image
-                src={src}
-                alt={`Project mockup ${index + 1}`}
-                width={1600}
-                height={1200}
-                className="h-full w-full bg-neutral-800 object-cover"
-              />
-            </div>
-          ))}
-        </div>
-        {/* Add scroll indicator */}
-        <div className="flex justify-center mt-4">
-          <p className="text-sm text-gray-400">← Swipe to explore projects →</p>
-        </div>
-      </div>
-
       {/* Spacer to ensure the page continues scrolling after the pinned section */}
-      <div className="h-[10vh] md:h-[20vh] bg-black"></div>
+      <div className="h-[20vh] bg-black"></div>
     </div>
   );
 };

@@ -150,6 +150,21 @@
   --sky-400: #38bdf8;
   --sky-500: #0ea5e9;
 }
+
+/* Ensure Lenis has full control over scrolling */
+html {
+  scroll-behavior: auto !important; /* Override any smooth scroll behavior */
+}
+
+body {
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Disable any conflicting scroll behaviors */
+*, *::before, *::after {
+  scroll-behavior: auto !important;
+}
+
 /*Hide the default browser cursor
 /* html, body, *, *:before, *:after {
   cursor: none !important;
@@ -171,83 +186,4 @@ button.system, a.system {
 }
 .animate-marquee {
   animation: marquee 20s linear infinite;
-}
-
-/* Smooth scrolling improvements */
-html {
-  scroll-behavior: auto; /* Let Lenis handle smooth scrolling */
-  height: 100%;
-}
-
-/* Disable native smooth scrolling to prevent conflicts */
-* {
-  scroll-behavior: auto;
-}
-
-/* Better scrolling performance */
-body {
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  height: 100%;
-  position: relative;
-}
-
-/* Lenis smooth scrolling optimization */
-[data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-/* Prevent scroll issues on mobile */
-@media (max-width: 768px) {
-  body {
-    overflow-x: hidden;
-    position: relative;
-    /* Disable smooth scrolling on mobile for better performance */
-    -webkit-overflow-scrolling: auto;
-  }
-  
-  /* Disable Lenis on mobile if needed */
-  .lenis.lenis-smooth {
-    scroll-behavior: auto;
-  }
-}
-@media (max-width: 768px) {
-  /* Improve text readability on mobile */
-  body {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
-  
-  /* Better scrolling on mobile */
-  * {
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Mobile marquee improvements */
-  .marquee-container {
-    overflow-x: hidden;
-  }
-  
-  /* Mobile horizontal scroll improvements */
-  .mobile-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  }
-  
-  .mobile-scroll::-webkit-scrollbar {
-    height: 4px;
-  }
-  
-  .mobile-scroll::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .mobile-scroll::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
-  }
-  
-  .mobile-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
-  }
 }
