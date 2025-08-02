@@ -13,6 +13,10 @@ export default function HeroScrollSection() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const line1Ref = useRef<HTMLDivElement | null>(null);
   const line2Ref = useRef<HTMLDivElement | null>(null);
+  const projectsRef = useRef<HTMLDivElement | null>(null);
+  const eCharRef = useRef<HTMLSpanElement | null>(null);
+  const whiteWashRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null); // Main content container for unified zoom
   const rafId = useRef<number | null>(null);
 
   useEffect(() => {
@@ -20,6 +24,23 @@ export default function HeroScrollSection() {
     // Get the global Lenis instance from your page.tsx setup
     const getLenisInstance = () => {
       return (window as any).__lenis_instance;
+    };
+
+    // compute transform-origin for PROJECTS text so scale is anchored on the center of 'E'
+    const updateTransformOrigin = () => {
+      const projectsText = projectsRef.current;
+      const eChar = eCharRef.current;
+      if (!projectsText || !eChar) return;
+
+      const textRect = projectsText.getBoundingClientRect();
+      const eRect = eChar.getBoundingClientRect();
+
+      const originX =
+        ((eRect.left - textRect.left + eRect.width / 2) / textRect.width) * 100;
+      const originY =
+        ((eRect.top - textRect.top + eRect.height / 2) / textRect.height) * 100;
+
+      projectsText.style.transformOrigin = `${originX}% ${originY}%`;
     };
 
     // Wait for Lenis to be available
@@ -35,19 +56,30 @@ export default function HeroScrollSection() {
 
       console.log("[HeroScrollSection] Connected to global Lenis instance");
 
-      // Animation timeline: light rising reveal
+      // Set initial states
+      gsap.set(projectsRef.current, { opacity: 1, scale: 0 });
+      gsap.set(whiteWashRef.current, { opacity: 0 });
+      gsap.set(contentRef.current, { scale: 1 }); // Initial scale for content container
+
+      // recalibrate transform origin after fonts load & on resize
+      document.fonts?.ready.then(updateTransformOrigin);
+      window.addEventListener("resize", updateTransformOrigin);
+      updateTransformOrigin();
+
+      // Animation timeline combining text-rise and unified zoom effects
       const ctx = gsap.context(() => {
-        const tl = gsap.timeline({
+        // Text rise animation timeline
+        const textRiseTl = gsap.timeline({
           scrollTrigger: {
             trigger: containerRef.current!,
             start: "top center",
-            end: "bottom center",
-            scrub: 1, // smooth scrubbing
-            invalidateOnRefresh: true, // Important for Lenis
+            end: "bottom center", 
+            scrub: 1,
+            invalidateOnRefresh: true,
           },
         });
 
-        tl.from(line1Ref.current, {
+        textRiseTl.from(line1Ref.current, {
           y: 80,
           opacity: 0,
           duration: 1.5,
@@ -62,17 +94,80 @@ export default function HeroScrollSection() {
           },
           "<0.3"
         );
+
+        // Unified zoom animation timeline for entire viewport
+        const unifiedZoomTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current!,
+            start: "top top",
+            end: "+=4000",
+            scrub: 1.5,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // Zoom the entire content container (including text-rise content)
+        unifiedZoomTl.to(
+          contentRef.current,
+          {
+            scale: 4, // Zoom the entire viewport content
+            ease: "none",
+            duration: 0.7,
+          },
+          0
+        );
+
+        // Simultaneously animate PROJECTS text from 0 to visible
+        unifiedZoomTl.to(
+          projectsRef.current,
+          {
+            scale: 3.5, // Relative to the already zoomed container
+            opacity: 1,
+            letterSpacing: "0.05em",
+            ease: "none",
+            duration: 0.7,
+          },
+          0
+        );
+
+        // White wash comes in during later part of zoom
+        unifiedZoomTl.to(
+          whiteWashRef.current,
+          {
+            opacity: 1,
+            ease: "power1.inOut",
+            duration: 0.4,
+          },
+          0.5
+        );
+
+        // Fade out all content as white wash completes
+        unifiedZoomTl.to(
+          contentRef.current,
+          {
+            opacity: 0,
+            ease: "power2.inOut",
+            duration: 0.3,
+          },
+          0.7
+        );
       }, containerRef);
 
       // Refresh to ensure correct sizing
       ScrollTrigger.refresh();
 
-      return ctx;
+      return () => {
+        window.removeEventListener("resize", updateTransformOrigin);
+        ctx.revert();
+      };
     };
 
     // Setup with delay to ensure Lenis is ready
     const cleanup = setTimeout(() => {
-      setupScrollTrigger();
+      const cleanupFn = setupScrollTrigger();
+      return cleanupFn;
     }, 300);
 
     return () => {
@@ -99,35 +194,71 @@ export default function HeroScrollSection() {
         }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 w-full h-full px-6">
-        {/* First line top-left */}
-        <div className="h-full flex flex-col justify-between">
-          <div className="flex justify-start pt-12">
-            <div
-              ref={line1Ref}
-              className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
-              style={{
-                fontSize: "clamp(4rem, 9vw, 9rem)",
-                maxWidth: "70%",
-              }}
-            >
-              SCROLL  <br />
-                    TO SEE
-            </div>
-          </div>
+      {/* White wash overlay for PROJECTS zoom */}
+      <div
+        ref={whiteWashRef}
+        className="absolute inset-0 bg-white pointer-events-none z-20"
+        style={{ opacity: 0 }}
+      />
 
-          {/* Second line bottom right */}
-          <div className="flex justify-end pb-12">
-            <div
-              ref={line2Ref}
-              className="text-white uppercase font-extrabold leading-[0.85] tracking-tight text-right"
-              style={{
-                fontSize: "clamp(4rem, 9vw, 9rem)",
-                maxWidth: "70%",
-              }}
-            >
-              SECRETS I SHIP
+      {/* Main content container that will be zoomed */}
+      <div ref={contentRef} className="relative z-10 w-full h-full">
+        {/* PROJECTS zoom text overlay */}
+        <div className="absolute inset-0 z-30 flex items-center justify-center">
+          <div
+            ref={projectsRef}
+            className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
+            style={{
+              fontSize: "clamp(4rem, 14vw, 12rem)",
+              whiteSpace: "nowrap",
+              willChange: "transform, opacity",
+              display: "inline-flex",
+              gap: "0",
+            }}
+          >
+            <span>P</span>
+            <span>R</span>
+            <span>O</span>
+            <span>J</span>
+            <span ref={eCharRef} style={{ position: "relative" }}>
+              E
+            </span>
+            <span>C</span>
+            <span>T</span>
+            <span>S</span>
+          </div>
+        </div>
+
+        {/* Text-rise content */}
+        <div className="relative z-10 w-full h-full px-6">
+          {/* First line top-left */}
+          <div className="h-full flex flex-col justify-between">
+            <div className="flex justify-start pt-12">
+              <div
+                ref={line1Ref}
+                className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
+                style={{
+                  fontSize: "clamp(4rem, 9vw, 9rem)",
+                  maxWidth: "70%",
+                }}
+              >
+                SCROLL  <br />
+                      TO SEE
+              </div>
+            </div>
+
+            {/* Second line bottom right */}
+            <div className="flex justify-end pb-12">
+              <div
+                ref={line2Ref}
+                className="text-white uppercase font-extrabold leading-[0.85] tracking-tight text-right"
+                style={{
+                  fontSize: "clamp(4rem, 9vw, 9rem)",
+                  maxWidth: "70%",
+                }}
+              >
+                SECRETS I SHIP
+              </div>
             </div>
           </div>
         </div>
