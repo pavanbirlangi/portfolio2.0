@@ -99,7 +99,7 @@ export default function HeroScrollSection() {
         const unifiedZoomTl = gsap.timeline({
           scrollTrigger: {
             trigger: containerRef.current!,
-            start: "top top",
+            start: "top 80px", // Start when section reaches just below navbar (80px from top)
             end: "+=4000",
             scrub: 1.5,
             pin: true,
