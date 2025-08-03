@@ -15,6 +15,7 @@ export default function HeroScrollSection() {
   const line2Ref = useRef<HTMLDivElement | null>(null);
   const projectsRef = useRef<HTMLDivElement | null>(null);
   const eCharRef = useRef<HTMLSpanElement | null>(null);
+  const jCharRef = useRef<HTMLSpanElement | null>(null); // Ref for letter J
   const whiteWashRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null); // Main content container for unified zoom
   const rafId = useRef<number | null>(null);
@@ -26,21 +27,21 @@ export default function HeroScrollSection() {
       return (window as any).__lenis_instance;
     };
 
-    // compute transform-origin for PROJECTS text so scale is anchored on the center of 'E'
+    // compute transform-origin for content container so scale is anchored on the center of 'J' in PROJECTS
     const updateTransformOrigin = () => {
-      const projectsText = projectsRef.current;
-      const eChar = eCharRef.current;
-      if (!projectsText || !eChar) return;
+      const contentContainer = contentRef.current;
+      const jChar = jCharRef.current;
+      if (!contentContainer || !jChar) return;
 
-      const textRect = projectsText.getBoundingClientRect();
-      const eRect = eChar.getBoundingClientRect();
+      const containerRect = contentContainer.getBoundingClientRect();
+      const jRect = jChar.getBoundingClientRect();
 
       const originX =
-        ((eRect.left - textRect.left + eRect.width / 2) / textRect.width) * 100;
+        ((jRect.left - containerRect.left + jRect.width / 2) / containerRect.width) * 100;
       const originY =
-        ((eRect.top - textRect.top + eRect.height / 2) / textRect.height) * 100;
+        ((jRect.top - containerRect.top + jRect.height / 2) / containerRect.height) * 100;
 
-      projectsText.style.transformOrigin = `${originX}% ${originY}%`;
+      contentContainer.style.transformOrigin = `${originX}% ${originY}%`;
     };
 
     // Wait for Lenis to be available
@@ -57,14 +58,18 @@ export default function HeroScrollSection() {
       console.log("[HeroScrollSection] Connected to global Lenis instance");
 
       // Set initial states
-      gsap.set(projectsRef.current, { opacity: 1, scale: 0 });
+      gsap.set(projectsRef.current, { opacity: 1, scale: 0.1 }); // Start with small scale instead of 0
       gsap.set(whiteWashRef.current, { opacity: 0 });
       gsap.set(contentRef.current, { scale: 1 }); // Initial scale for content container
 
       // recalibrate transform origin after fonts load & on resize
-      document.fonts?.ready.then(updateTransformOrigin);
+      document.fonts?.ready.then(() => {
+        setTimeout(updateTransformOrigin, 100); // Delay to ensure elements are rendered
+      });
       window.addEventListener("resize", updateTransformOrigin);
-      updateTransformOrigin();
+      
+      // Initial call with delay to ensure DOM is ready
+      setTimeout(updateTransformOrigin, 200);
 
       // Animation timeline combining text-rise and unified zoom effects
       const ctx = gsap.context(() => {
@@ -105,6 +110,10 @@ export default function HeroScrollSection() {
             pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
+            onRefresh: () => {
+              // Recalculate transform origin when ScrollTrigger refreshes
+              setTimeout(updateTransformOrigin, 100);
+            },
           },
         });
 
@@ -112,46 +121,46 @@ export default function HeroScrollSection() {
         unifiedZoomTl.to(
           contentRef.current,
           {
-            scale: 4, // Zoom the entire viewport content
+            scale: 8, // Increased zoom for more dramatic effect before white wash
             ease: "none",
-            duration: 0.7,
+            duration: 0.8, // Longer duration for more zoom time
           },
           0
         );
 
-        // Simultaneously animate PROJECTS text from 0 to visible
+        // Simultaneously animate PROJECTS text from small to visible
         unifiedZoomTl.to(
           projectsRef.current,
           {
-            scale: 3.5, // Relative to the already zoomed container
+            scale: 6, // Increased scale relative to the zoomed container
             opacity: 1,
             letterSpacing: "0.05em",
             ease: "none",
-            duration: 0.7,
+            duration: 0.8, // Match the container zoom duration
           },
           0
         );
 
-        // White wash comes in during later part of zoom
+        // Black wash comes in much later after more zoom
         unifiedZoomTl.to(
           whiteWashRef.current,
           {
             opacity: 1,
             ease: "power1.inOut",
-            duration: 0.4,
+            duration: 0.3,
           },
-          0.5
+          0.75 // Delayed much later to allow more zoom
         );
 
-        // Fade out all content as white wash completes
+        // Fade out all content as black wash completes
         unifiedZoomTl.to(
           contentRef.current,
           {
             opacity: 0,
             ease: "power2.inOut",
-            duration: 0.3,
+            duration: 0.2,
           },
-          0.7
+          0.9 // Start fade out after black wash is well established
         );
       }, containerRef);
 
@@ -194,10 +203,10 @@ export default function HeroScrollSection() {
         }}
       />
 
-      {/* White wash overlay for PROJECTS zoom */}
+      {/* Black wash overlay for PROJECTS zoom */}
       <div
         ref={whiteWashRef}
-        className="absolute inset-0 bg-white pointer-events-none z-20"
+        className="absolute inset-0 bg-black pointer-events-none z-20"
         style={{ opacity: 0 }}
       />
 
@@ -219,7 +228,9 @@ export default function HeroScrollSection() {
             <span>P</span>
             <span>R</span>
             <span>O</span>
-            <span>J</span>
+            <span ref={jCharRef} style={{ position: "relative" }}>
+              J
+            </span>
             <span ref={eCharRef} style={{ position: "relative" }}>
               E
             </span>
@@ -266,4 +277,3 @@ export default function HeroScrollSection() {
     </section>
   );
 }
-
