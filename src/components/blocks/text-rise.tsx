@@ -18,6 +18,10 @@ export default function HeroScrollSection() {
   const jCharRef = useRef<HTMLSpanElement | null>(null); // Ref for letter J
   const whiteWashRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null); // Main content container for unified zoom
+  const myRef = useRef<HTMLDivElement | null>(null); // Ref for "MY" text
+  const workRef = useRef<HTMLDivElement | null>(null); // Ref for "WORK" text
+  const myContainerRef = useRef<HTMLDivElement | null>(null); // Ref for "MY" container for clipping
+  const workContainerRef = useRef<HTMLDivElement | null>(null); // Ref for "WORK" container for clipping
   const rafId = useRef<number | null>(null);
 
   useEffect(() => {
@@ -61,6 +65,8 @@ export default function HeroScrollSection() {
       gsap.set(projectsRef.current, { opacity: 1, scale: 0.1 }); // Start with small scale instead of 0
       gsap.set(whiteWashRef.current, { opacity: 0 });
       gsap.set(contentRef.current, { scale: 1 }); // Initial scale for content container
+      gsap.set(myContainerRef.current, { clipPath: "inset(100% 0% 0% 0%)" }); // Clip "MY" from bottom for baseline rise
+      gsap.set(workContainerRef.current, { clipPath: "inset(100% 0% 0% 0%)" }); // Clip "WORK" from bottom for baseline rise
 
       // recalibrate transform origin after fonts load & on resize
       document.fonts?.ready.then(() => {
@@ -104,7 +110,7 @@ export default function HeroScrollSection() {
         const unifiedZoomTl = gsap.timeline({
           scrollTrigger: {
             trigger: containerRef.current!,
-            start: "top 80px", // Start when section reaches just below navbar (80px from top)
+            start: "top top", // Start when section reaches just below navbar (80px from top)
             end: "+=4000",
             scrub: 1.5,
             pin: true,
@@ -162,6 +168,28 @@ export default function HeroScrollSection() {
           },
           0.9 // Start fade out after black wash is well established
         );
+
+        // MY and WORK text animations - separate baseline rise for each line after black screen is loaded
+        unifiedZoomTl.to(
+          myContainerRef.current,
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            ease: "power2.out",
+            duration: 0.4,
+          },
+          1.0 // Start after black wash and content fade are complete
+        );
+
+        // WORK animates slightly after MY for staggered effect
+        unifiedZoomTl.to(
+          workContainerRef.current,
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            ease: "power2.out",
+            duration: 0.4,
+          },
+          1.15 // Start slightly after MY for staggered baseline rise
+        );
       }, containerRef);
 
       // Refresh to ensure correct sizing
@@ -188,7 +216,7 @@ export default function HeroScrollSection() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[calc(100vh-80px)] mt-20 overflow-hidden bg-black"
+      className="relative w-full h-screen overflow-hidden bg-black"
     >
       {/* Dark background base */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900 to-black" />
@@ -203,12 +231,55 @@ export default function HeroScrollSection() {
         }}
       />
 
-      {/* Black wash overlay for PROJECTS zoom */}
+      {/* Black wash overlay for PROJECTS zoom - this becomes the projects section background */}
       <div
         ref={whiteWashRef}
         className="absolute inset-0 bg-black pointer-events-none z-20"
         style={{ opacity: 0 }}
-      />
+      >
+        {/* Projects content that appears on the black screen */}
+        <div className="absolute top-20 right-0 p-6 md:p-12 pointer-events-auto">
+          <div className="text-right">
+            {/* MY container with its own baseline clipping */}
+            <div
+              ref={myContainerRef}
+              style={{
+                overflow: "hidden",
+              }}
+            >
+              <div
+                ref={myRef}
+                className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
+                style={{
+                  fontSize: "clamp(3rem, 8vw, 8rem)",
+                  willChange: "clip-path",
+                }}
+              >
+                MY
+              </div>
+            </div>
+            
+            {/* WORK container with its own baseline clipping */}
+            <div
+              ref={workContainerRef}
+              style={{
+                overflow: "hidden",
+              }}
+            >
+              <div
+                ref={workRef}
+                className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
+                style={{
+                  fontSize: "clamp(3rem, 8vw, 8rem)",
+                  willChange: "clip-path",
+                }}
+              >
+                WORK
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Main content container that will be zoomed */}
       <div ref={contentRef} className="relative z-10 w-full h-full">
