@@ -15,6 +15,7 @@ interface ProjectItem {
   id: string;
   title: string;
   description: string;
+  image: string; // Add image property
 }
 
 const SAMPLE_PROJECTS: ProjectItem[] = [
@@ -22,31 +23,37 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     id: "p1",
     title: "Realtime Search Engine",
     description: "Low-latency indexing with incremental updates.",
+    image: "/images/img_1.png", // First project image
   },
   {
     id: "p2",
     title: "GenAI Assistant",
     description: "Context-aware prompt orchestration pipeline.",
+    image: "/images/img_2.png", // Second project image
   },
   {
     id: "p3",
     title: "Scalable API Mesh",
     description: "Resilient routing and observability baked in.",
+    image: "/images/img_3.png", // Third project image
   },
   {
     id: "p4",
     title: "Personal Dashboard",
     description: "Unified metrics with live polling and caching.",
+    image: "/images/img_4.png", // Fourth project image
   },
   {
     id: "p5",
     title: "Content Recommendation",
     description: "Hybrid filtering with user-adaptive scoring.",
+    image: "/images/img_5.png", // Fifth project image
   },
   {
     id: "p6",
     title: "AI-Powered Analytics",
     description: "Real-time insights with machine learning predictions.",
+    image: "/images/QR-Code.png", // Sixth project image (reusing first one, or add img_6.png)
   },
 ];
 
@@ -167,11 +174,13 @@ export default function HeroScrollSection() {
           scrollTrigger: {
             trigger: containerRef.current!,
             start: "top top", // Start when section reaches just below navbar (80px from top)
-            end: "+=6000", // Extended for project cards scroll
-            scrub: 1.5,
+            end: "+=8000", // Increased for longer, smoother animation
+            scrub: 0.5, // Much lower scrub for ultra-smooth scrolling
             pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
+            refreshPriority: -1, // Lower priority to avoid conflicts
+            fastScrollEnd: true, // Better performance on fast scrolling
             onRefresh: () => {
               // Recalculate transform origin when ScrollTrigger refreshes
               setTimeout(updateTransformOrigin, 100);
@@ -251,6 +260,12 @@ export default function HeroScrollSection() {
         const projectCards = projectsCardsRef.current?.querySelectorAll('.project-card');
         if (projectCards) {
           projectCards.forEach((card, index) => {
+            // Set will-change for better performance and disable any CSS transitions
+            gsap.set(card, { 
+              willChange: "transform, opacity",
+              transition: "none" // Disable any CSS transitions that might interfere
+            });
+            
             // Each card starts from a distance and moves to its final stacked position
             unifiedZoomTl.fromTo(
               card,
@@ -260,6 +275,7 @@ export default function HeroScrollSection() {
                 opacity: 0,
                 scale: 0.7,
                 rotation: 0, // No rotation - straight diagonal movement
+                force3D: true, // Force hardware acceleration
               },
               {
                 y: index * 50, // Final diagonal Y position (adjusted for 6 cards)
@@ -267,10 +283,15 @@ export default function HeroScrollSection() {
                 opacity: 1,
                 scale: 1,
                 rotation: 0, // No rotation - cards stay straight
-                ease: "power3.out",
-                duration: 0.8,
+                ease: "linear", // Explicitly use linear for constant speed (same as "none")
+                duration: 0.6, // Slightly shorter for snappier feel
+                force3D: true, // Force hardware acceleration
+                onComplete: () => {
+                  // Remove will-change after animation completes for performance
+                  gsap.set(card, { willChange: "auto" });
+                }
               },
-              1.8 + (index * 1.2) // Much larger delay between cards so each card waits for previous to finish
+              1.8 + (index * 1.0) // Reduced delay for smoother flow
             );
           });
         }
@@ -379,7 +400,7 @@ export default function HeroScrollSection() {
                   key={project.id}
                   className={clsx(
                     "project-card absolute rounded-2xl border border-white/20 backdrop-blur-md shadow-2xl",
-                    "overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105"
+                    "overflow-hidden cursor-pointer"
                   )}
                   style={{
                     zIndex: idx + 1, // Later cards have higher z-index (appear on top)
@@ -393,12 +414,13 @@ export default function HeroScrollSection() {
                   }}
                 >
                   {/* Project Image */}
+                                    {/* Project Image */}
                   <div className="relative h-48 w-full overflow-hidden">
                     <Image
-                      src="/images/img_2.png"
+                      src={project.image}
                       alt={project.title}
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      className="object-cover"
                     />
                     
                     {/* Hover overlay with View Demo link */}
@@ -427,27 +449,82 @@ export default function HeroScrollSection() {
                     
                     {/* View Details Link - Bottom Right Corner */}
                     <div className="flex justify-end mt-4">
-                      <div className="group/details cursor-pointer">
-                        <div className="flex items-center gap-2 text-white/70 group-hover/details:text-white transition-colors duration-300">
-                          <span className="text-sm font-medium relative overflow-hidden">
+                      <div 
+                        className="group/details cursor-pointer"
+                        onMouseEnter={(e) => {
+                          const target = e.currentTarget;
+                          const underline = target.querySelector('.underline-animation');
+                          const arrow = target.querySelector('.arrow-animation');
+                          const text = target.querySelector('.text-animation');
+                          
+                          // Smooth GSAP animations on hover
+                          gsap.timeline()
+                            .to(text, { 
+                              color: "rgba(255, 255, 255, 1)", 
+                              duration: 0.3, 
+                              ease: "power2.out" 
+                            })
+                            .to(underline, { 
+                              width: "100%", 
+                              duration: 0.5, 
+                              ease: "power3.out" 
+                            }, 0)
+                            .to(arrow, { 
+                              x: 4, 
+                              scale: 1.1, 
+                              duration: 0.4, 
+                              ease: "back.out(1.7)" 
+                            }, 0.1);
+                        }}
+                        onMouseLeave={(e) => {
+                          const target = e.currentTarget;
+                          const underline = target.querySelector('.underline-animation');
+                          const arrow = target.querySelector('.arrow-animation');
+                          const text = target.querySelector('.text-animation');
+                          
+                          // Smooth GSAP animations on hover out
+                          gsap.timeline()
+                            .to(text, { 
+                              color: "rgba(255, 255, 255, 0.7)", 
+                              duration: 0.3, 
+                              ease: "power2.out" 
+                            })
+                            .to(underline, { 
+                              width: "0%", 
+                              duration: 0.4, 
+                              ease: "power3.out" 
+                            }, 0)
+                            .to(arrow, { 
+                              x: 0, 
+                              scale: 1, 
+                              duration: 0.4, 
+                              ease: "power3.out" 
+                            }, 0);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium relative overflow-hidden text-animation" style={{ color: "rgba(255, 255, 255, 0.7)" }}>
                             View Details
                             {/* Smooth underline animation */}
-                            <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-white group-hover/details:w-full transition-all duration-500 ease-out"></span>
+                            <span 
+                              className="underline-animation absolute bottom-0 left-0 h-[2px] bg-white"
+                              style={{ width: "0%" }}
+                            ></span>
                           </span>
                           {/* Arrow with smooth animation */}
                           <div className="relative w-4 h-4 overflow-hidden">
                             <svg 
-                              className="w-4 h-4 transform transition-all duration-500 ease-out group-hover/details:translate-x-1 group-hover/details:scale-110" 
+                              className="arrow-animation w-4 h-4" 
                               fill="none" 
                               stroke="currentColor" 
                               viewBox="0 0 24 24"
+                              style={{ color: "rgba(255, 255, 255, 0.7)" }}
                             >
                               <path 
                                 strokeLinecap="round" 
                                 strokeLinejoin="round" 
                                 strokeWidth={2} 
                                 d="M17 8l4 4m0 0l-4 4m4-4H3"
-                                className="transition-all duration-500 ease-out"
                               />
                             </svg>
                           </div>
