@@ -6,8 +6,49 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import clsx from "clsx";
+import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
+
+interface ProjectItem {
+  id: string;
+  title: string;
+  description: string;
+}
+
+const SAMPLE_PROJECTS: ProjectItem[] = [
+  {
+    id: "p1",
+    title: "Realtime Search Engine",
+    description: "Low-latency indexing with incremental updates.",
+  },
+  {
+    id: "p2",
+    title: "GenAI Assistant",
+    description: "Context-aware prompt orchestration pipeline.",
+  },
+  {
+    id: "p3",
+    title: "Scalable API Mesh",
+    description: "Resilient routing and observability baked in.",
+  },
+  {
+    id: "p4",
+    title: "Personal Dashboard",
+    description: "Unified metrics with live polling and caching.",
+  },
+  {
+    id: "p5",
+    title: "Content Recommendation",
+    description: "Hybrid filtering with user-adaptive scoring.",
+  },
+  {
+    id: "p6",
+    title: "AI-Powered Analytics",
+    description: "Real-time insights with machine learning predictions.",
+  },
+];
 
 export default function HeroScrollSection() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -22,6 +63,7 @@ export default function HeroScrollSection() {
   const workRef = useRef<HTMLDivElement | null>(null); // Ref for "WORK" text
   const myContainerRef = useRef<HTMLDivElement | null>(null); // Ref for "MY" container for clipping
   const workContainerRef = useRef<HTMLDivElement | null>(null); // Ref for "WORK" container for clipping
+  const projectsCardsRef = useRef<HTMLDivElement | null>(null); // Ref for projects cards container
   const rafId = useRef<number | null>(null);
 
   useEffect(() => {
@@ -67,6 +109,20 @@ export default function HeroScrollSection() {
       gsap.set(contentRef.current, { scale: 1 }); // Initial scale for content container
       gsap.set(myContainerRef.current, { clipPath: "inset(100% 0% 0% 0%)" }); // Clip "MY" from bottom for baseline rise
       gsap.set(workContainerRef.current, { clipPath: "inset(100% 0% 0% 0%)" }); // Clip "WORK" from bottom for baseline rise
+      
+      // Set initial state for individual project cards
+      const projectCards = projectsCardsRef.current?.querySelectorAll('.project-card');
+      if (projectCards) {
+        projectCards.forEach((card, index) => {
+          gsap.set(card, { 
+            opacity: 0, 
+            y: 400 + (index * 50), // Each card starts from progressively lower position
+            x: 300 + (index * 100), // Each card starts from progressively more right position
+            scale: 0.7,
+            rotation: 0, // No rotation - straight diagonal movement
+          });
+        });
+      }
 
       // recalibrate transform origin after fonts load & on resize
       document.fonts?.ready.then(() => {
@@ -111,7 +167,7 @@ export default function HeroScrollSection() {
           scrollTrigger: {
             trigger: containerRef.current!,
             start: "top top", // Start when section reaches just below navbar (80px from top)
-            end: "+=4000",
+            end: "+=6000", // Extended for project cards scroll
             scrub: 1.5,
             pin: true,
             anticipatePin: 1,
@@ -190,6 +246,34 @@ export default function HeroScrollSection() {
           },
           1.15 // Start slightly after MY for staggered baseline rise
         );
+
+        // Project cards stacking animation - each card comes and stacks on top of previous ones
+        const projectCards = projectsCardsRef.current?.querySelectorAll('.project-card');
+        if (projectCards) {
+          projectCards.forEach((card, index) => {
+            // Each card starts from a distance and moves to its final stacked position
+            unifiedZoomTl.fromTo(
+              card,
+              {
+                y: 400 + (index * 50), // Each card starts from progressively lower position
+                x: 300 + (index * 100), // Each card starts from progressively more right position
+                opacity: 0,
+                scale: 0.7,
+                rotation: 0, // No rotation - straight diagonal movement
+              },
+              {
+                y: index * 50, // Final diagonal Y position (adjusted for 6 cards)
+                x: index * 100, // Final diagonal X position (adjusted for 6 cards)
+                opacity: 1,
+                scale: 1,
+                rotation: 0, // No rotation - cards stay straight
+                ease: "power3.out",
+                duration: 0.8,
+              },
+              1.8 + (index * 1.2) // Much larger delay between cards so each card waits for previous to finish
+            );
+          });
+        }
       }, containerRef);
 
       // Refresh to ensure correct sizing
@@ -277,6 +361,103 @@ export default function HeroScrollSection() {
                 WORK
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Project cards that appear after MY WORK animation */}
+        <div 
+          ref={projectsCardsRef}
+          className="absolute top-20 left-0 w-full h-[calc(100vh-5rem)] px-6"
+        >
+          <div 
+            className="relative w-full h-full"
+            style={{ perspective: "1400px" }}
+          >
+            {SAMPLE_PROJECTS.map((project, idx) => {
+              return (
+                <div
+                  key={project.id}
+                  className={clsx(
+                    "project-card absolute rounded-2xl border border-white/20 backdrop-blur-md shadow-2xl",
+                    "overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105"
+                  )}
+                  style={{
+                    zIndex: idx + 1, // Later cards have higher z-index (appear on top)
+                    width: "480px", // Increased width for better visual presence
+                    height: "460px", // Slightly reduced height for better fit
+                    background: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    // Diagonal positioning from top-left to bottom-right (adjusted for 6 cards)
+                    transform: `translate(${idx * 100}px, ${idx * 50}px)`, // Reduced offsets to fit 6 cards better
+                  }}
+                >
+                  {/* Project Image */}
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image
+                      src="/images/img_2.png"
+                      alt={project.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    
+                    {/* Hover overlay with View Demo link */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/30">
+                        <span className="text-white font-semibold">View Demo</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Project Content */}
+                  <div className="p-6 relative h-full flex flex-col">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className="text-pink-400 font-extrabold text-2xl flex-shrink-0 leading-none">
+                        {String(idx + 1).padStart(2, "0")}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold tracking-tight mb-2 text-white">
+                          {project.title}
+                        </h3>
+                        <p className="text-sm text-white/70 leading-relaxed">
+                          {project.description}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* View Details Link - Bottom Right Corner */}
+                    <div className="flex justify-end mt-4">
+                      <div className="group/details cursor-pointer">
+                        <div className="flex items-center gap-2 text-white/70 group-hover/details:text-white transition-colors duration-300">
+                          <span className="text-sm font-medium relative overflow-hidden">
+                            View Details
+                            {/* Smooth underline animation */}
+                            <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-white group-hover/details:w-full transition-all duration-500 ease-out"></span>
+                          </span>
+                          {/* Arrow with smooth animation */}
+                          <div className="relative w-4 h-4 overflow-hidden">
+                            <svg 
+                              className="w-4 h-4 transform transition-all duration-500 ease-out group-hover/details:translate-x-1 group-hover/details:scale-110" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                className="transition-all duration-500 ease-out"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

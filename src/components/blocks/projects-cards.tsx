@@ -14,7 +14,7 @@ interface ProjectItem {
   description: string;
 }
 
-const SAMPLE_PROJECTS: ProjectItem[] = [
+const DEFAULT_PROJECTS: ProjectItem[] = [
   {
     id: "p1",
     title: "Realtime Search Engine",
@@ -63,40 +63,41 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
 ];
 
 export default function ProjectsStackSection({
-  projects = SAMPLE_PROJECTS,
+  projects = DEFAULT_PROJECTS,
 }: {
   projects?: ProjectItem[];
 }) {
   const containerRef = useRef<HTMLElement | null>(null);
-  const cardsRef = useRef<HTMLDivElement | null>(null);
+  const cardsWrapperRef = useRef<HTMLDivElement | null>(null);
   const lenisHandlerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const container = containerRef.current!;
-    const cardsContainer = cardsRef.current!;
+    const wrapper = cardsWrapperRef.current!;
     const cards: HTMLElement[] = Array.from(
-      cardsContainer.querySelectorAll(".project-card")
-    ) as any;
+      wrapper.querySelectorAll<HTMLElement>(".project-card")
+    );
 
     // === Lenis integration ===
     const lenis = (window as any).lenis || (window as any).lenisInstance;
     if (!lenis) {
       console.warn(
-        "[ProjectsStackSection] Lenis instance missing on window; ScrollTrigger sync may degrade."
+        "[ProjectsStackSection] Lenis instance not found on window; ScrollTrigger might not sync perfectly."
       );
     }
 
+    // Proxy scroll for GSAP to use Lenis
     ScrollTrigger.scrollerProxy(document.documentElement, {
       scrollTop(value?: number) {
         if (!lenis) {
-          if (arguments.length) window.scrollTo(0, value as number);
+          if (arguments.length && typeof value === "number") window.scrollTo(0, value);
           return window.scrollY;
         }
-        if (arguments.length) {
+        if (arguments.length && typeof value === "number") {
           if (typeof lenis.scrollTo === "function") {
             lenis.scrollTo(value, { immediate: true });
           } else {
-            window.scrollTo(0, value as number);
+            window.scrollTo(0, value);
           }
         }
         return typeof lenis.scroll === "number" ? lenis.scroll : window.scrollY;
@@ -126,24 +127,25 @@ export default function ProjectsStackSection({
       requestAnimationFrame(raf);
     }
 
-    // Timeline
+    // Build the scroll timeline
     const ctx = gsap.context(() => {
+      const totalSpacing = 120 * projects.length; // determines how long the pin lasts
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: "top top",
-          end: "+=800", // controls how long the pin/animation lasts
+          end: `+=${totalSpacing}`,
           scrub: true,
           pin: true,
           anticipatePin: 1,
         },
       });
 
-      // cards come in with staggered upward fade; they sit in their layered offset position already via CSS
+      // Staggered reveal: each card comes in with upward/fade
       tl.from(
         cards,
         {
-          y: 50,
+          y: 60,
           opacity: 0,
           scale: 0.98,
           ease: "power3.out",
@@ -152,26 +154,26 @@ export default function ProjectsStackSection({
         0
       );
 
-      // optional subtle 3d depth shift on earlier cards as scroll progresses
+      // Optional: add slight de-emphasis on earlier cards as scroll progresses
       cards.forEach((card, i) => {
         const depthTl = gsap.timeline({
           scrollTrigger: {
             trigger: container,
             start: "top top",
-            end: "+=800",
+            end: `+=${totalSpacing}`,
             scrub: true,
           },
         });
-        // earlier cards slightly shift in z or blur to feel like depth (lightly)
-        depthTl.to(
-          card,
-          {
-            filter: i < 3 ? "brightness(0.95)" : "none",
-            // you could also add a tiny rotateX/rotateY if desired for parallax:
-            // rotationX: i * 0.2,
-          },
-          0
-        );
+        // earlier cards slightly dim
+        if (i < 3) {
+          depthTl.to(
+            card,
+            {
+              filter: "brightness(0.94)",
+            },
+            0
+          );
+        }
       });
     }, container);
 
@@ -189,39 +191,47 @@ export default function ProjectsStackSection({
   return (
     <section
       ref={containerRef as any}
-      className="relative w-full min-h-[120vh] bg-transparent"
+      className="relative w-full bg-transparent"
+      style={{ minHeight: `${projects.length * 120}vh` }} // enough scroll space
     >
-      <div className="max-w-[1200px] mx-auto py-32 px-6">
-        <div className="relative" style={{ perspective: "1000px" }}>
-          {projects.map((p, idx) => (
-            <div
-              key={p.id}
-              className={clsx(
-                "project-card pointer-events-none relative rounded-2xl border border-gray-700 bg-[#0f0f11] p-8 shadow-2xl backdrop-blur-md max-w-xl",
-                // stacking offset
-                "will-change-transform"
-              )}
-              style={{
-                zIndex: projects.length - idx,
-                transform: `translateY(${idx * 10}px)`,
-                marginTop: idx === 0 ? 0 : `-${(projects.length - idx) * 2}px`,
-              }}
-            >
-              <div className="flex items-start gap-4">
-                <div className="text-indigo-500 font-mono text-2xl flex-shrink-0">
-                  {String(idx + 1).padStart(2, "0")}
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold tracking-tight mb-1">
-                    {p.title}
-                  </h3>
-                  <p className="text-sm text-gray-300">{p.description}</p>
+      <div className="max-w-[1400px] mx-auto py-32 px-6">
+        <div
+          ref={cardsWrapperRef as any}
+          className="relative h-[80vh] flex items-center"
+          style={{ perspective: "1400px" }}
+        >
+          {projects.map((p, idx) => {
+            const OFFSET_X = 50; // horizontal step
+            const OFFSET_Y = 15; // vertical step
+            return (
+              <div
+                key={p.id}
+                className={clsx(
+                  "project-card pointer-events-none absolute rounded-2xl border border-gray-300 bg-white/[0.95] p-8 shadow-lg backdrop-blur-sm",
+                  "overflow-hidden"
+                )}
+                style={{
+                  zIndex: projects.length - idx,
+                  transform: `translate(${idx * OFFSET_X}px, ${idx * OFFSET_Y}px)`,
+                  width: "380px",
+                  // Slight translucent look to earlier ones
+                  opacity: 1,
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="text-pink-400 font-extrabold text-4xl flex-shrink-0 leading-none">
+                    {String(idx + 1).padStart(2, "0")}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold tracking-tight mb-1 text-black">
+                      {p.title}
+                    </h3>
+                    <p className="text-sm text-gray-700">{p.description}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          {/* Spacer so pinned section has room after animation */}
-          <div ref={cardsRef as any} className="absolute inset-0 pointer-events-none" />
+            );
+          })}
         </div>
       </div>
     </section>
