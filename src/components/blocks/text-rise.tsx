@@ -15,7 +15,9 @@ interface ProjectItem {
   id: string;
   title: string;
   description: string;
-  image: string; // Add image property
+  image: string;
+  codeUrl: string; // GitHub repository URL
+  viewUrl: string; // Live demo URL
 }
 
 const SAMPLE_PROJECTS: ProjectItem[] = [
@@ -23,37 +25,49 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
     id: "p1",
     title: "Realtime Search Engine",
     description: "Low-latency indexing with incremental updates.",
-    image: "/images/img_1.png", // First project image
+    image: "/images/img_1.png",
+    codeUrl: "https://github.com/pavanbirlangi/realtime-search",
+    viewUrl: "https://realtime-search-demo.vercel.app",
   },
   {
     id: "p2",
     title: "GenAI Assistant",
     description: "Context-aware prompt orchestration pipeline.",
-    image: "/images/img_2.png", // Second project image
+    image: "/images/img_2.png",
+    codeUrl: "https://github.com/pavanbirlangi/genai-assistant",
+    viewUrl: "https://genai-assistant-demo.vercel.app",
   },
   {
     id: "p3",
     title: "Scalable API Mesh",
     description: "Resilient routing and observability baked in.",
-    image: "/images/img_3.png", // Third project image
+    image: "/images/img_3.png",
+    codeUrl: "https://github.com/pavanbirlangi/api-mesh",
+    viewUrl: "https://api-mesh-demo.vercel.app",
   },
   {
     id: "p4",
     title: "Personal Dashboard",
     description: "Unified metrics with live polling and caching.",
-    image: "/images/img_4.png", // Fourth project image
+    image: "/images/img_4.png",
+    codeUrl: "https://github.com/pavanbirlangi/personal-dashboard",
+    viewUrl: "https://personal-dashboard-demo.vercel.app",
   },
   {
     id: "p5",
     title: "Content Recommendation",
     description: "Hybrid filtering with user-adaptive scoring.",
-    image: "/images/img_5.png", // Fifth project image
+    image: "/images/img_5.png",
+    codeUrl: "https://github.com/pavanbirlangi/content-recommendation",
+    viewUrl: "https://content-rec-demo.vercel.app",
   },
   {
     id: "p6",
     title: "AI-Powered Analytics",
     description: "Real-time insights with machine learning predictions.",
-    image: "/images/QR-Code.png", // Sixth project image (reusing first one, or add img_6.png)
+    image: "/images/QR-Code.png",
+    codeUrl: "https://github.com/pavanbirlangi/ai-analytics",
+    viewUrl: "https://ai-analytics-demo.vercel.app",
   },
 ];
 
@@ -413,9 +427,8 @@ export default function HeroScrollSection() {
                     transform: `translate(${idx * 100}px, ${idx * 50}px)`, // Reduced offsets to fit 6 cards better
                   }}
                 >
-                  {/* Project Image */}
-                                    {/* Project Image */}
-                  <div className="relative h-48 w-full overflow-hidden">
+                  {/* Project Image - 65% height */}
+                  <div className="relative w-full overflow-hidden" style={{ height: "65%" }}>
                     <Image
                       src={project.image}
                       alt={project.title}
@@ -431,105 +444,76 @@ export default function HeroScrollSection() {
                     </div>
                   </div>
                   
-                  {/* Project Content */}
-                  <div className="p-6 relative h-full flex flex-col">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="text-pink-400 font-extrabold text-2xl flex-shrink-0 leading-none">
+                  {/* Project Content - 25% height */}
+                  <div className="p-4 relative flex flex-col" style={{ height: "25%" }}>
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="text-pink-400 font-extrabold text-xl flex-shrink-0 leading-none">
                         {String(idx + 1).padStart(2, "0")}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold tracking-tight mb-2 text-white">
+                      <div className="flex-1 min-h-0">
+                        <h3 className="text-base font-bold tracking-tight mb-1 text-white line-clamp-2">
                           {project.title}
                         </h3>
-                        <p className="text-sm text-white/70 leading-relaxed">
+                        <p className="text-xs text-white/70 leading-relaxed line-clamp-2">
                           {project.description}
                         </p>
                       </div>
                     </div>
-                    
-                    {/* View Details Link - Bottom Right Corner */}
-                    <div className="flex justify-end mt-4">
-                      <div 
-                        className="group/details cursor-pointer"
-                        onMouseEnter={(e) => {
-                          const target = e.currentTarget;
-                          const underline = target.querySelector('.underline-animation');
-                          const arrow = target.querySelector('.arrow-animation');
-                          const text = target.querySelector('.text-animation');
-                          
-                          // Smooth GSAP animations on hover
-                          gsap.timeline()
-                            .to(text, { 
-                              color: "rgba(255, 255, 255, 1)", 
-                              duration: 0.3, 
-                              ease: "power2.out" 
-                            })
-                            .to(underline, { 
-                              width: "100%", 
-                              duration: 0.5, 
-                              ease: "power3.out" 
-                            }, 0)
-                            .to(arrow, { 
-                              x: 4, 
-                              scale: 1.1, 
-                              duration: 0.4, 
-                              ease: "back.out(1.7)" 
-                            }, 0.1);
-                        }}
-                        onMouseLeave={(e) => {
-                          const target = e.currentTarget;
-                          const underline = target.querySelector('.underline-animation');
-                          const arrow = target.querySelector('.arrow-animation');
-                          const text = target.querySelector('.text-animation');
-                          
-                          // Smooth GSAP animations on hover out
-                          gsap.timeline()
-                            .to(text, { 
-                              color: "rgba(255, 255, 255, 0.7)", 
-                              duration: 0.3, 
-                              ease: "power2.out" 
-                            })
-                            .to(underline, { 
-                              width: "0%", 
-                              duration: 0.4, 
-                              ease: "power3.out" 
-                            }, 0)
-                            .to(arrow, { 
-                              x: 0, 
-                              scale: 1, 
-                              duration: 0.4, 
-                              ease: "power3.out" 
-                            }, 0);
-                        }}
+                  </div>
+
+                  {/* Bottom section for hover links - 10% height */}
+                  <div className="relative flex items-center justify-end px-4 py-2" style={{ height: "10%" }}>
+                    <div className="flex items-center gap-4">
+                      {/* Code link with GitHub icon */}
+                      <a 
+                        href={project.codeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 cursor-pointer group/code"
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium relative overflow-hidden text-animation" style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-                            View Details
-                            {/* Smooth underline animation */}
-                            <span 
-                              className="underline-animation absolute bottom-0 left-0 h-[2px] bg-white"
-                              style={{ width: "0%" }}
-                            ></span>
-                          </span>
-                          {/* Arrow with smooth animation */}
-                          <div className="relative w-4 h-4 overflow-hidden">
-                            <svg 
-                              className="arrow-animation w-4 h-4" 
-                              fill="none" 
-                              stroke="currentColor" 
-                              viewBox="0 0 24 24"
-                              style={{ color: "rgba(255, 255, 255, 0.7)" }}
-                            >
-                              <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M17 8l4 4m0 0l-4 4m4-4H3"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
+                        <svg 
+                          className="w-4 h-4 text-white/70 group-hover/code:text-white transition-colors duration-300" 
+                          fill="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        <span className="text-sm font-medium text-white/70 group-hover/code:text-white transition-colors duration-300 relative">
+                          Code
+                          {/* Smooth underline animation */}
+                          <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-white group-hover/code:w-full transition-all duration-300 ease-out"></span>
+                        </span>
+                      </a>
+
+                      {/* Divider */}
+                      <div className="w-px h-4 bg-white/20"></div>
+
+                      {/* View link with external arrow */}
+                      <a 
+                        href={project.viewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 cursor-pointer group/view"
+                      >
+                        <span className="text-sm font-medium text-white/70 group-hover/view:text-white transition-colors duration-300 relative">
+                          View
+                          {/* Smooth underline animation */}
+                          <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-white group-hover/view:w-full transition-all duration-300 ease-out"></span>
+                        </span>
+                        <svg 
+                          className="w-4 h-4 text-white/70 group-hover/view:text-white group-hover/view:translate-x-0.5 group-hover/view:-translate-y-0.5 transition-all duration-300" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </a>
                     </div>
                   </div>
                 </div>
