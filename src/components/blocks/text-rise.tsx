@@ -135,10 +135,18 @@ export default function HeroScrollSection() {
       const projectCards = projectsCardsRef.current?.querySelectorAll('.project-card');
       if (projectCards) {
         projectCards.forEach((card, index) => {
+          // Check if mobile/tablet view for initial positioning (safely)
+          const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+          const cardSpacing = isMobile ? 50 : 60; // Tighter spacing on mobile
+          const initialX = isMobile ? 0 : 300 + (index * 120);
+          const initialY = isMobile 
+            ? 300 + (index * cardSpacing) // Mobile: start lower to move up closer to MY WORK
+            : 400 + (index * 60); // Desktop: start lower to move up to top-left
+          
           gsap.set(card, { 
             opacity: 0, 
-            y: 400 + (index * 50), // Each card starts from progressively lower position
-            x: 300 + (index * 100), // Each card starts from progressively more right position
+            y: initialY, // Responsive initial Y position with consistent spacing
+            x: initialX, // Responsive initial X position (0 for mobile)
             scale: 0.7,
             rotation: 0, // No rotation - straight diagonal movement
           });
@@ -149,7 +157,31 @@ export default function HeroScrollSection() {
       document.fonts?.ready.then(() => {
         setTimeout(updateTransformOrigin, 100); // Delay to ensure elements are rendered
       });
-      window.addEventListener("resize", updateTransformOrigin);
+      
+        const handleResize = () => {
+          updateTransformOrigin();
+          // Update card positions for responsive layout
+          const projectCards = projectsCardsRef.current?.querySelectorAll('.project-card');
+          if (projectCards) {
+            projectCards.forEach((card, index) => {
+              const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+              const isTablet = typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1024;
+              const cardSpacing = isMobile ? 50 : 60; // Tighter spacing on mobile
+              
+              const finalOffset = isMobile 
+                ? { x: 0, y: 80 + (index * cardSpacing) } // Mobile: closer below MY WORK text
+                : isTablet 
+                  ? { x: index * 80, y: index * 60 } // Tablet: diagonal from top
+                  : { x: index * 120, y: index * 60 }; // Desktop: diagonal from top-left
+                  
+              // Update transform immediately for resize
+              gsap.set(card, {
+                x: finalOffset.x,
+                y: finalOffset.y,
+              });
+            });
+          }
+        };      window.addEventListener("resize", handleResize);
       
       // Initial call with delay to ensure DOM is ready
       setTimeout(updateTransformOrigin, 200);
@@ -280,20 +312,35 @@ export default function HeroScrollSection() {
               transition: "none" // Disable any CSS transitions that might interfere
             });
             
+            // Check if mobile/tablet view
+            const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+            const isTablet = typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1024;
+            
+            // Calculate responsive positioning with consistent Y spacing
+            const cardSpacing = isMobile ? 50 : 60; // Tighter spacing on mobile
+            const mobileOffset = { x: 0, y: 80 + (index * cardSpacing) }; // Mobile: start closer below MY WORK text
+            const tabletOffset = { x: index * 80, y: index * 60 }; // Tablet: diagonal from top (keep 60px spacing)
+            const desktopOffset = { x: index * 120, y: index * 60 }; // Desktop: diagonal from top-left (keep 60px spacing)
+            
+            const finalOffset = isMobile ? mobileOffset : isTablet ? tabletOffset : desktopOffset;
+            const startOffset = isMobile 
+              ? { x: 0, y: 300 + (index * cardSpacing) } 
+              : { x: 300 + (index * 120), y: 400 + (index * 60) };
+            
             // Each card starts from a distance and moves to its final stacked position
             unifiedZoomTl.fromTo(
               card,
               {
-                y: 400 + (index * 50), // Each card starts from progressively lower position
-                x: 300 + (index * 100), // Each card starts from progressively more right position
+                y: startOffset.y, // Each card starts from progressively lower position
+                x: startOffset.x, // Mobile: center, Desktop: right offset
                 opacity: 0,
                 scale: 0.7,
                 rotation: 0, // No rotation - straight diagonal movement
                 force3D: true, // Force hardware acceleration
               },
               {
-                y: index * 50, // Final diagonal Y position (adjusted for 6 cards)
-                x: index * 100, // Final diagonal X position (adjusted for 6 cards)
+                y: finalOffset.y, // Final Y position (responsive)
+                x: finalOffset.x, // Final X position (responsive)
                 opacity: 1,
                 scale: 1,
                 rotation: 0, // No rotation - cards stay straight
@@ -315,7 +362,7 @@ export default function HeroScrollSection() {
       ScrollTrigger.refresh();
 
       return () => {
-        window.removeEventListener("resize", updateTransformOrigin);
+        window.removeEventListener("resize", handleResize);
         ctx.revert();
       };
     };
@@ -357,7 +404,7 @@ export default function HeroScrollSection() {
         style={{ opacity: 0 }}
       >
         {/* Projects content that appears on the black screen */}
-        <div className="absolute top-20 right-0 p-6 md:p-12 pointer-events-auto">
+        <div className="absolute top-20 right-0 p-4 md:p-6 lg:p-12 pointer-events-auto">
           <div className="text-right">
             {/* MY container with its own baseline clipping */}
             <div
@@ -370,7 +417,7 @@ export default function HeroScrollSection() {
                 ref={myRef}
                 className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
                 style={{
-                  fontSize: "clamp(3rem, 8vw, 8rem)",
+                  fontSize: "clamp(2rem, 8vw, 8rem)",
                   willChange: "clip-path",
                 }}
               >
@@ -389,7 +436,7 @@ export default function HeroScrollSection() {
                 ref={workRef}
                 className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
                 style={{
-                  fontSize: "clamp(3rem, 8vw, 8rem)",
+                  fontSize: "clamp(2rem, 8vw, 8rem)",
                   willChange: "clip-path",
                 }}
               >
@@ -402,7 +449,7 @@ export default function HeroScrollSection() {
         {/* Project cards that appear after MY WORK animation */}
         <div 
           ref={projectsCardsRef}
-          className="absolute top-20 left-0 w-full h-[calc(100vh-5rem)] px-6 pointer-events-auto"
+          className="absolute top-20 md:top-20 left-0 w-full h-[calc(100vh-5rem)] md:h-[calc(100vh-5rem)] px-4 md:px-6 pointer-events-auto"
         >
           <div 
             className="relative w-full h-full"
@@ -418,12 +465,13 @@ export default function HeroScrollSection() {
                   )}
                   style={{
                     zIndex: idx + 10, // Higher z-index to ensure they're above other elements
-                    width: "480px",
-                    height: "460px",
+                    width: "min(380px, calc(100vw - 2rem))", // Smaller width for mobile, larger for desktop
+                    height: "min(360px, 50vh)", // Smaller height for better mobile fit
                     background: "rgba(255, 255, 255, 0.1)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.2)",
-                    transform: `translate(${idx * 100}px, ${idx * 50}px)`,
+                    // Initial positioning will be handled by GSAP animation
+                    transform: `translate(${idx * 120}px, ${idx * 60}px)`, // Desktop: top-left diagonal
                   }}
                 >
                   {/* Project Image - 65% height */}
