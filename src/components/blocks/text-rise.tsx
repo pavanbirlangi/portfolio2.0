@@ -402,7 +402,7 @@ export default function HeroScrollSection() {
         {/* Project cards that appear after MY WORK animation */}
         <div 
           ref={projectsCardsRef}
-          className="absolute top-20 left-0 w-full h-[calc(100vh-5rem)] px-6"
+          className="absolute top-20 left-0 w-full h-[calc(100vh-5rem)] px-6 pointer-events-auto"
         >
           <div 
             className="relative w-full h-full"
@@ -414,17 +414,16 @@ export default function HeroScrollSection() {
                   key={project.id}
                   className={clsx(
                     "project-card absolute rounded-2xl border border-white/20 backdrop-blur-md shadow-2xl",
-                    "overflow-hidden cursor-pointer"
+                    "overflow-hidden pointer-events-auto"
                   )}
                   style={{
-                    zIndex: idx + 1, // Later cards have higher z-index (appear on top)
-                    width: "480px", // Increased width for better visual presence
-                    height: "460px", // Slightly reduced height for better fit
+                    zIndex: idx + 10, // Higher z-index to ensure they're above other elements
+                    width: "480px",
+                    height: "460px",
                     background: "rgba(255, 255, 255, 0.1)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.2)",
-                    // Diagonal positioning from top-left to bottom-right (adjusted for 6 cards)
-                    transform: `translate(${idx * 100}px, ${idx * 50}px)`, // Reduced offsets to fit 6 cards better
+                    transform: `translate(${idx * 100}px, ${idx * 50}px)`,
                   }}
                 >
                   {/* Project Image - 65% height */}
@@ -462,14 +461,18 @@ export default function HeroScrollSection() {
                   </div>
 
                   {/* Bottom section for hover links - 10% height */}
-                  <div className="relative flex items-center justify-end px-4 py-2" style={{ height: "10%" }}>
-                    <div className="flex items-center gap-4">
+                  <div className="relative flex items-center justify-end px-4 py-2 pointer-events-auto z-20" style={{ height: "10%" }}>
+                    <div className="flex items-center gap-4 pointer-events-auto">
                       {/* Code link with GitHub icon */}
                       <a 
                         href={project.codeUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 cursor-pointer group/code"
+                        className="flex items-center gap-1 cursor-pointer group/code hover:scale-105 transition-transform duration-200 pointer-events-auto z-30"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('Code link clicked:', project.codeUrl);
+                        }}
                       >
                         <svg 
                           className="w-4 h-4 text-white/70 group-hover/code:text-white transition-colors duration-300" 
@@ -493,7 +496,11 @@ export default function HeroScrollSection() {
                         href={project.viewUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 cursor-pointer group/view"
+                        className="flex items-center gap-1 cursor-pointer group/view hover:scale-105 transition-transform duration-200 pointer-events-auto z-30"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('View link clicked:', project.viewUrl);
+                        }}
                       >
                         <span className="text-sm font-medium text-white/70 group-hover/view:text-white transition-colors duration-300 relative">
                           View
