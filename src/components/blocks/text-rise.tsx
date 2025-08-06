@@ -86,6 +86,8 @@ export default function HeroScrollSection() {
   const workContainerRef = useRef<HTMLDivElement | null>(null); // Ref for "WORK" container for clipping
   const projectsCardsRef = useRef<HTMLDivElement | null>(null); // Ref for projects cards container
   const rafId = useRef<number | null>(null);
+  const scrollDirection = useRef<'down' | 'up' | null>(null);
+  const lastScrollY = useRef<number>(0);
 
   useEffect(() => {
     // === Lenis integration ===
@@ -149,6 +151,10 @@ export default function HeroScrollSection() {
             x: initialX, // Responsive initial X position (0 for mobile)
             scale: 0.7,
             rotation: 0, // No rotation - straight diagonal movement
+            force3D: true, // Enable GPU acceleration from start
+            backfaceVisibility: "hidden", // Prevent flickering
+            transformOrigin: "center center",
+            willChange: "transform, opacity", // Optimize for animation
           });
         });
       }
@@ -220,13 +226,41 @@ export default function HeroScrollSection() {
           scrollTrigger: {
             trigger: containerRef.current!,
             start: "top top", // Start when section reaches just below navbar (80px from top)
-            end: "+=8000", // Increased for longer, smoother animation
-            scrub: 0.5, // Much lower scrub for ultra-smooth scrolling
+            end: "+=10000", // Longer scroll distance for smoother animation
+            scrub: 0.5, // Slightly higher scrub for better reverse performance
             pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             refreshPriority: -1, // Lower priority to avoid conflicts
             fastScrollEnd: true, // Better performance on fast scrolling
+            preventOverlaps: true, // Prevent animation conflicts
+            onUpdate: (self) => {
+              // Track scroll direction for performance optimization
+              const currentScrollY = window.scrollY;
+              const currentDirection = currentScrollY > lastScrollY.current ? 'down' : 'up';
+              
+              // Only update if direction changed
+              if (currentDirection !== scrollDirection.current) {
+                scrollDirection.current = currentDirection;
+                
+                // Optimize performance based on direction
+                const cards = projectsCardsRef.current?.querySelectorAll('.project-card');
+                if (cards && self.isActive) {
+                  cards.forEach((card) => {
+                    // Use RAF for smoother performance updates
+                    if (rafId.current) cancelAnimationFrame(rafId.current);
+                    rafId.current = requestAnimationFrame(() => {
+                      gsap.set(card, { 
+                        willChange: "transform, opacity",
+                        backfaceVisibility: "hidden"
+                      });
+                    });
+                  });
+                }
+              }
+              
+              lastScrollY.current = currentScrollY;
+            },
             onRefresh: () => {
               // Recalculate transform origin when ScrollTrigger refreshes
               setTimeout(updateTransformOrigin, 100);
@@ -309,7 +343,9 @@ export default function HeroScrollSection() {
             // Set will-change for better performance and disable any CSS transitions
             gsap.set(card, { 
               willChange: "transform, opacity",
-              transition: "none" // Disable any CSS transitions that might interfere
+              transition: "none", // Disable any CSS transitions that might interfere
+              backfaceVisibility: "hidden", // Prevent flickering
+              perspective: 1000, // Enable 3D acceleration
             });
             
             // Check if mobile/tablet view
@@ -337,6 +373,7 @@ export default function HeroScrollSection() {
                 scale: 0.7,
                 rotation: 0, // No rotation - straight diagonal movement
                 force3D: true, // Force hardware acceleration
+                transformOrigin: "center center",
               },
               {
                 y: finalOffset.y, // Final Y position (responsive)
@@ -344,15 +381,30 @@ export default function HeroScrollSection() {
                 opacity: 1,
                 scale: 1,
                 rotation: 0, // No rotation - cards stay straight
-                ease: "linear", // Explicitly use linear for constant speed (same as "none")
-                duration: 0.6, // Slightly shorter for snappier feel
+                ease: "none", // Use linear easing for consistent forward/reverse performance
+                duration: 0.8, // Longer duration for smoother animation
                 force3D: true, // Force hardware acceleration
+                transformOrigin: "center center",
+                onStart: () => {
+                  // Ensure optimal performance settings at animation start
+                  gsap.set(card, { 
+                    willChange: "transform, opacity",
+                    backfaceVisibility: "hidden"
+                  });
+                },
+                onReverseComplete: () => {
+                  // Reset performance optimizations when animation reverses completely
+                  gsap.set(card, { 
+                    willChange: "auto",
+                    backfaceVisibility: "visible"
+                  });
+                },
                 onComplete: () => {
-                  // Remove will-change after animation completes for performance
-                  gsap.set(card, { willChange: "auto" });
+                  // Keep will-change during scroll for smooth reverse
+                  gsap.set(card, { willChange: "transform, opacity" });
                 }
               },
-              1.8 + (index * 1.0) // Reduced delay for smoother flow
+              1.8 + (index * 0.8) // Reduced stagger for smoother flow
             );
           });
         }
@@ -363,6 +415,7 @@ export default function HeroScrollSection() {
 
       return () => {
         window.removeEventListener("resize", handleResize);
+        if (rafId.current) cancelAnimationFrame(rafId.current);
         ctx.revert();
       };
     };
@@ -375,6 +428,7 @@ export default function HeroScrollSection() {
 
     return () => {
       clearTimeout(cleanup);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
   }, []);
@@ -472,6 +526,12 @@ export default function HeroScrollSection() {
                     border: "1px solid rgba(255, 255, 255, 0.2)",
                     // Initial positioning will be handled by GSAP animation
                     transform: `translate(${idx * 120}px, ${idx * 60}px)`, // Desktop: top-left diagonal
+                    // Performance optimizations
+                    willChange: "transform, opacity",
+                    backfaceVisibility: "hidden",
+                    transformStyle: "preserve-3d",
+                    WebkitFontSmoothing: "antialiased",
+                    isolation: "isolate", // Create new stacking context
                   }}
                 >
                   {/* Project Image - 65% height */}
