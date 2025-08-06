@@ -10,6 +10,7 @@ import Lenis from '@studio-freight/lenis'; // Import Lenis
 import { ContainerScroll, CardSticky } from "@/components/blocks/cards-stack"
 import  { Process } from "@/components/process"
 import HeroScrollSection from "@/components/blocks/text-rise"
+import HeroScrollAnimation from "@/components/ui/hero-scroll-animation"
 
 
 export default function Home() {
@@ -219,6 +220,7 @@ export default function Home() {
 
           <Process />
           <HeroScrollSection />
+          <HeroScrollAnimation />
 
           {/* Removed the duplicate About component from here */}
         </main>
