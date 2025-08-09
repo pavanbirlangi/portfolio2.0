@@ -1,8 +1,9 @@
 'use client';
 
 import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
-import React, { useRef, forwardRef } from 'react';
+import React, { useRef, forwardRef, useEffect } from 'react';
 import Image from 'next/image';
+import SpotlightCard from '@/components/blocks/spotlight-card';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
@@ -12,6 +13,24 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, -5]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  
+  const spotlightData = [
+    {
+      title: "Performance First",
+      description: "Optimized solutions that scale with your business needs and deliver exceptional user experiences.",
+      icon: "🚀"
+    },
+    {
+      title: "Modern Architecture",
+      description: "Built with cutting-edge technologies and best practices for maintainable, robust applications.",
+      icon: "💎"
+    },
+    {
+      title: "User-Centric Design",
+      description: "Intuitive interfaces that prioritize user experience and drive meaningful engagement.",
+      icon: "✨"
+    }
+  ];
   
   return (
     <motion.section
@@ -31,27 +50,46 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
         }}
       />
 
-      <div className="relative z-10 text-center px-8 max-w-6xl">
-        <h1 className='text-6xl md:text-7xl 2xl:text-8xl font-extrabold text-center tracking-tight leading-[0.9] mb-6'>
-          CRAFTING DIGITAL <br />
-          <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-            EXPERIENCES
-          </span>
-        </h1>
-        <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
-          Where innovation meets execution. Building scalable solutions that transform ideas into reality.
-        </p>
-        
-        {/* Scroll indicator */}
-        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-sm text-white/60 uppercase tracking-wider">Continue Exploring</span>
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <motion.div 
-              className="w-1 h-2 bg-white/60 rounded-full mt-2"
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
+      <div className="relative z-10 container mx-auto px-4 md:px-6 max-w-7xl h-full flex flex-col justify-center py-8 md:py-0">
+        {/* Header Section */}
+        <div className="text-center mb-12 md:mb-16">
+          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center tracking-tight leading-[0.9] mb-4 md:mb-6'>
+            CRAFTING DIGITAL <br />
+            <span className="text-gray-300">
+              EXPERIENCES
+            </span>
+          </h1>
+          <p className="text-base md:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed px-4">
+            Building scalable solutions that transform ideas into reality.
+          </p>
+        </div>
+
+        {/* Spotlight Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto px-4 md:px-0">
+          {spotlightData.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.2, duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <SpotlightCard 
+                className="h-full"
+                spotlightColor="rgba(156, 163, 175, 0.3)"
+              >
+                <div className="flex flex-col items-center text-center h-full">
+                  <div className="text-4xl mb-4">{item.icon}</div>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-white/70 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
+              </SpotlightCard>
+            </motion.div>
+          ))}
         </div>
       </div>
     </motion.section>
@@ -63,13 +101,6 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
   const rotate = useTransform(scrollYProgress, [0, 1], [5, 0]);
   const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
 
-  const skills = [
-    { name: "Frontend Development", tech: "React, Next.js, TypeScript" },
-    { name: "Backend Architecture", tech: "Node.js, Python, Microservices" },
-    { name: "Cloud & DevOps", tech: "AWS, Docker, Kubernetes" },
-    { name: "Database Design", tech: "PostgreSQL, MongoDB, Redis" },
-  ];
-
   return (
     <motion.section
       style={{ scale, rotate }}
@@ -78,57 +109,70 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
       {/* Grid background */}
       <div className='absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f1a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f1a_1px,transparent_1px)] bg-[size:80px_80px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_70%,transparent_100%)]'></div>
       
-      <motion.article style={{ y }} className='container mx-auto relative z-10 px-6 py-20 h-full flex flex-col justify-center'>
-        <div className="mb-16">
-          <h2 className='text-5xl md:text-6xl lg:text-7xl leading-[0.9] font-extrabold tracking-tight mb-6'>
-            EXPERTISE THAT <br />
-            <span className="text-pink-400">DELIVERS</span>
-          </h2>
-          <p className="text-lg md:text-xl text-white/70 max-w-2xl leading-relaxed">
-            From concept to deployment, I build robust systems that scale with your vision.
-          </p>
-        </div>
-
-        {/* Skills Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl'>
-          {skills.map((skill, index) => (
-            <motion.div
-              key={skill.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.6 }}
-              viewport={{ once: true }}
-              className="group relative p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm hover:border-pink-400/30 hover:bg-white/10 transition-all duration-300"
-            >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-pink-400/5 to-purple-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative z-10">
-                <h3 className="text-xl font-bold mb-2 text-white group-hover:text-pink-400 transition-colors duration-300">
-                  {skill.name}
-                </h3>
-                <p className="text-white/60 text-sm">
-                  {skill.tech}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Tech Stack Showcase */}
-        <div className="mt-16 pt-8 border-t border-white/10">
-          <div className="flex flex-wrap gap-4 justify-center">
-            {['React', 'TypeScript', 'Node.js', 'AWS', 'Docker', 'PostgreSQL'].map((tech, index) => (
-              <motion.span
-                key={tech}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1, duration: 0.4 }}
-                viewport={{ once: true }}
-                className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-sm font-medium text-white/80 hover:bg-pink-400/20 hover:border-pink-400/40 hover:text-white transition-all duration-300"
+      <motion.article style={{ y }} className='container mx-auto relative z-10 px-6 py-20 h-full flex flex-col justify-center items-center text-center'>
+        {/* Call to Action Section */}
+        <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.1 }}
+            className="mb-12"
+          >
+            <div className="overflow-hidden">
+              <motion.h3 
+                className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 tracking-tight leading-[0.9]"
+                initial={{ y: "100%" }}
+                whileInView={{ y: "0%" }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                viewport={{ once: true, amount: 0.1 }}
               >
-                {tech}
-              </motion.span>
-            ))}
-          </div>
+                Have a vision?
+              </motion.h3>
+            </div>
+            <div className="overflow-hidden">
+              <motion.p 
+                className="text-4xl md:text-5xl lg:text-6xl text-gray-300 font-light tracking-wide"
+                initial={{ y: "100%" }}
+                whileInView={{ y: "0%" }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+                viewport={{ once: true, amount: 0.1 }}
+              >
+                Let's make it real.
+              </motion.p>
+            </div>
+          </motion.div>
+          
+          <button
+            onClick={() => {
+              console.log('Button clicked'); // Debug log
+              try {
+                // @ts-ignore
+                if (typeof window !== 'undefined' && window.Cal) {
+                  console.log('Cal found, opening modal'); // Debug log
+                  // @ts-ignore
+                  window.Cal('ui', {
+                    "styles":{"branding":{"color":"#292929"}},
+                    "hideEventTypeDetails":false,
+                    "layout":"month_view"
+                  });
+                  // @ts-ignore
+                  window.Cal('openModal', 'devcapo/15min');
+                } else {
+                  console.log('Cal not found, redirecting to Cal.com'); // Debug log
+                  window.open('https://cal.com/devcapo/15min', '_blank');
+                }
+              } catch (error) {
+                console.error('Cal.com error:', error);
+                // Fallback to direct link
+                window.open('https://cal.com/devcapo/15min', '_blank');
+              }
+            }}
+            className="group relative px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 rounded-full text-lg font-semibold text-white transition-all duration-300 hover:scale-105"
+          >
+            <span className="relative z-10">Let's Talk</span>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </button>
         </div>
       </motion.article>
     </motion.section>
@@ -137,30 +181,84 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
 
 const Component = forwardRef<HTMLElement>((props, ref) => {
   const container = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
+  
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ['start start', 'end end'],
   });
+
+  // Create a separate scroll trigger for the footer
+  const { scrollYProgress: footerScrollProgress } = useScroll({
+    target: footerRef,
+    offset: ['start end', 'end end'],
+  });
+
+  // Create a scroll-based trigger for the footer text
+  const footerY = useTransform(footerScrollProgress, [0, 0.5], ["100%", "0%"]);
+
+  useEffect(() => {
+    const unsubscribe = footerScrollProgress.onChange((progress) => {
+      console.log('Footer scroll progress:', progress);
+    });
+    return unsubscribe;
+  }, [footerScrollProgress]);
+
+  useEffect(() => {
+    // Load Cal.com script
+    const script = document.createElement('script');
+    script.src = 'https://app.cal.com/embed/embed.js';
+    script.async = true;
+    script.defer = true;
+    
+    script.onload = () => {
+      console.log('Cal.com script loaded successfully');
+      try {
+        // @ts-ignore
+        if (typeof window !== 'undefined' && window.Cal) {
+          // @ts-ignore
+          window.Cal('init', {origin:"https://cal.com"});
+          console.log('Cal.com initialized');
+        }
+      } catch (error) {
+        console.error('Cal.com initialization error:', error);
+      }
+    };
+
+    script.onerror = () => {
+      console.error('Failed to load Cal.com script');
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script when component unmounts
+      const existingScript = document.querySelector('script[src="https://app.cal.com/embed/embed.js"]');
+      if (existingScript) {
+        document.head.removeChild(existingScript);
+      }
+    };
+  }, []);
 
   return (
     <>
       <main ref={container} className='relative h-[200vh] bg-black -mt-1'>
         <Section1 scrollYProgress={scrollYProgress} />
         <Section2 scrollYProgress={scrollYProgress} />
-        <footer className='group bg-black relative overflow-hidden'>
+        <footer ref={footerRef} className='group bg-black relative overflow-hidden'>
           {/* Gradient background */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-zinc-900 to-black" />
           
           {/* Large text */}
-          <motion.h1 
-            className='relative z-10 text-[12vw] md:text-[16vw] translate-y-8 md:translate-y-20 leading-[0.8] uppercase font-extrabold text-center bg-gradient-to-r from-white/20 via-white/60 to-white/20 bg-clip-text text-transparent transition-all ease-linear py-20'
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            PORTFOLIO
-          </motion.h1>
+          <div className="overflow-hidden">
+            <motion.h1 
+              style={{ y: footerY }}
+              className='relative z-10 text-[12vw] md:text-[10vw] translate-y-8 md:translate-y-20 leading-[0.8] uppercase font-extrabold text-center bg-gradient-to-r from-white/20 via-white/60 to-white/20 bg-clip-text text-transparent transition-all ease-linear py-20'
+              onViewportEnter={() => console.log('Footer text in viewport')}
+            >
+              PAVAN BIRLANGI
+            </motion.h1>
+          </div>
           
           {/* Bottom section */}
           <div className='bg-black text-white h-32 md:h-40 relative z-10 grid place-content-center text-xl md:text-2xl rounded-tr-[3rem] rounded-tl-[3rem] border-t border-white/10'>
