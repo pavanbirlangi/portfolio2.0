@@ -4,6 +4,7 @@ import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
 import React, { useRef, forwardRef, useEffect } from 'react';
 import Image from 'next/image';
 import SpotlightCard from '@/components/blocks/spotlight-card';
+import { RevealText } from '@/components/blocks/video-text';
 
 interface SectionProps {
   scrollYProgress: MotionValue<number>;
@@ -54,9 +55,12 @@ const Section1: React.FC<SectionProps> = ({ scrollYProgress }) => {
         {/* Header Section */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center tracking-tight leading-[0.9] mb-4 md:mb-6'>
-            CRAFTING DIGITAL <br />
+            <RevealText inline animateOnView viewportAmount={0.3} viewportOnce text="CRAFTING" textColor="text-white" overlayColor="text-gray-300" trackingClass="tracking-tight" />
+            {" "}
+            <RevealText inline animateOnView viewportAmount={0.3} viewportOnce text="DIGITAL" textColor="text-white" overlayColor="text-gray-300" trackingClass="tracking-tight" />
+            <br />
             <span className="text-gray-300">
-              EXPERIENCES
+              <RevealText inline animateOnView viewportAmount={0.3} viewportOnce text="EXPERIENCES" textColor="text-gray-300" overlayColor="text-white" trackingClass="tracking-tight" />
             </span>
           </h1>
           <p className="text-base md:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed px-4">

@@ -7,7 +7,15 @@ interface RevealTextProps {
   text?: string;
   textColor?: string;
   overlayColor?: string;
-  fontSize?: string;
+  fontSize?: string; // optional; when omitted, font-size can be inherited from parent
+  fontWeightClass?: string; // optional; when omitted, font-weight can be inherited from parent
+  trackingClass?: string; // optional tracking class override
+  className?: string; // optional extra classes for each letter wrapper
+  inline?: boolean; // render inline without centering wrappers
+  containerClassName?: string; // extra classes for the outer container
+  animateOnView?: boolean; // start animations only when the component enters the viewport
+  viewportAmount?: number; // intersection amount for triggering
+  viewportOnce?: boolean; // whether to trigger only once
   letterDelay?: number;
   overlayDelay?: number;
   overlayDuration?: number;
@@ -19,7 +27,15 @@ export function RevealText({
   text = "CREATING DIGITAL EXPERIENCES",
   textColor = "text-white",
   overlayColor = "text-red-500",
-  fontSize = "text-[250px]",
+  fontSize,
+  fontWeightClass,
+  trackingClass = "tracking-tight",
+  className = "",
+  inline = false,
+  containerClassName = "",
+  animateOnView = false,
+  viewportAmount = 0.2,
+  viewportOnce = true,
   letterDelay = 0.08,
   overlayDelay = 0.05,
   overlayDuration = 0.4,
@@ -37,100 +53,194 @@ export function RevealText({
 }: RevealTextProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showRedText, setShowRedText] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(!animateOnView);
   
   useEffect(() => {
+    if (!shouldAnimate) return;
     // Calculate when the last letter animation completes
     // Last letter starts at (text.length - 1) * letterDelay seconds
     // Add springDuration for the spring animation to settle
     const lastLetterDelay = (text.length - 1) * letterDelay;
     const totalDelay = (lastLetterDelay * 1000) + springDuration;
-    
     const timer = setTimeout(() => {
       setShowRedText(true);
     }, totalDelay);
-    
     return () => clearTimeout(timer);
-  }, [text.length, letterDelay, springDuration]);
+  }, [shouldAnimate, text.length, letterDelay, springDuration]);
 
-  return (
-    <div className="flex items-center justify-center relative">
-      <div className="flex">
-        {text.split("").map((letter, index) => (
-          <motion.span
-            key={index}
-            onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            className={`${fontSize} font-black tracking-tight cursor-pointer relative overflow-hidden`}
-            initial={{ 
-              scale: 0,
-              opacity: 0,
-            }}
-            animate={{ 
-              scale: 1,
-              opacity: 1,
-            }}
-            transition={{
-              delay: index * letterDelay,
-              type: "spring",
-              damping: 8,
-              stiffness: 200,
-              mass: 0.8,
-            }}
-          >
-            {/* Base text layer */}
-            <motion.span 
-              className={`absolute inset-0 ${textColor}`}
-              animate={{ 
-                opacity: hoveredIndex === index ? 0 : 1 
-              }}
-              transition={{ duration: 0.1 }}
-            >
-              {letter}
-            </motion.span>
-            {/* Image text layer with background panning */}
-            <motion.span
-              className="text-transparent bg-clip-text bg-cover bg-no-repeat"
-              animate={{ 
-                opacity: hoveredIndex === index ? 1 : 0,
-                backgroundPosition: hoveredIndex === index ? "10% center" : "0% center"
-              }}
-              transition={{ 
-                opacity: { duration: 0.1 },
-                backgroundPosition: { 
-                  duration: 3,
-                  ease: "easeInOut"
-                }
-              }}
-              style={{
-                backgroundImage: `url('${letterImages[index % letterImages.length]}')`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {letter}
-            </motion.span>
-            
-            {/* Overlay text layer that sweeps across each letter */}
-            {showRedText && (
+  if (inline) {
+    return (
+      <motion.span
+        className={`relative ${containerClassName}`.trim()}
+        onViewportEnter={() => {
+          if (animateOnView) setShouldAnimate(true);
+        }}
+        onViewportLeave={() => {
+          if (animateOnView && !viewportOnce) {
+            setShouldAnimate(false);
+            setShowRedText(false);
+          }
+        }}
+        viewport={{ amount: viewportAmount, once: viewportOnce }}
+      >
+        <span className="inline-flex">
+          {text.split("").map((letter, index) => (
+            letter === " " ? (
+              <span key={`space-${index}`} className={`${fontSize ?? ""} ${fontWeightClass ?? ""} ${trackingClass} ${className}`.trim()}>
+                {"\u00A0"}
+              </span>
+            ) : (
               <motion.span
-                className={`absolute inset-0 ${overlayColor} pointer-events-none`}
-                initial={{ opacity: 0 }}
-                animate={{ 
-                  opacity: [0, 1, 1, 0]
+                key={index}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                className={`${fontSize ?? ""} ${fontWeightClass ?? ""} ${trackingClass} ${className} cursor-pointer relative overflow-hidden`.trim()}
+                initial="hidden"
+                animate={shouldAnimate ? "visible" : "hidden"}
+                variants={{
+                  hidden: { scale: 0, opacity: 0 },
+                  visible: { scale: 1, opacity: 1 }
                 }}
                 transition={{
-                  delay: index * overlayDelay,
-                  duration: overlayDuration,
-                  times: [0, 0.1, 0.7, 1],
-                  ease: "easeInOut"
+                  delay: index * letterDelay,
+                  type: "spring",
+                  damping: 8,
+                  stiffness: 200,
+                  mass: 0.8,
+                }}
+              >
+                <motion.span
+                  className={`absolute inset-0 ${textColor}`}
+                  animate={{ opacity: hoveredIndex === index ? 0 : 1 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  {letter}
+                </motion.span>
+                <motion.span
+                  className="text-transparent bg-clip-text bg-cover bg-no-repeat"
+                  animate={{
+                    opacity: hoveredIndex === index ? 1 : 0,
+                    backgroundPosition: hoveredIndex === index ? "10% center" : "0% center",
+                  }}
+                  transition={{
+                    opacity: { duration: 0.1 },
+                    backgroundPosition: { duration: 3, ease: "easeInOut" },
+                  }}
+                  style={{
+                    backgroundImage: `url('${letterImages[index % letterImages.length]}')`,
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  {letter}
+                </motion.span>
+                {showRedText && (
+                  <motion.span
+                    className={`absolute inset-0 ${overlayColor} pointer-events-none`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 1, 1, 0] }}
+                    transition={{
+                      delay: index * overlayDelay,
+                      duration: overlayDuration,
+                      times: [0, 0.1, 0.7, 1],
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {letter}
+                  </motion.span>
+                )}
+              </motion.span>
+            )
+          ))}
+        </span>
+      </motion.span>
+    );
+  }
+
+  return (
+    <motion.div
+      className={`flex items-center justify-center relative ${containerClassName}`.trim()}
+      onViewportEnter={() => {
+        if (animateOnView) setShouldAnimate(true);
+      }}
+      onViewportLeave={() => {
+        if (animateOnView && !viewportOnce) {
+          setShouldAnimate(false);
+          setShowRedText(false);
+        }
+      }}
+      viewport={{ amount: viewportAmount, once: viewportOnce }}
+    >
+      <div className="flex">
+        {text.split("").map((letter, index) => (
+          letter === " " ? (
+            <span key={`space-${index}`} className={`${fontSize ?? ""} ${fontWeightClass ?? ""} ${trackingClass} ${className}`.trim()}>
+              {"\u00A0"}
+            </span>
+          ) : (
+            <motion.span
+              key={index}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              className={`${fontSize ?? ""} ${fontWeightClass ?? ""} ${trackingClass} ${className} cursor-pointer relative overflow-hidden`.trim()}
+              initial="hidden"
+              animate={shouldAnimate ? "visible" : "hidden"}
+              variants={{
+                hidden: { scale: 0, opacity: 0 },
+                visible: { scale: 1, opacity: 1 }
+              }}
+              transition={{
+                delay: index * letterDelay,
+                type: "spring",
+                damping: 8,
+                stiffness: 200,
+                mass: 0.8,
+              }}
+            >
+              <motion.span
+                className={`absolute inset-0 ${textColor}`}
+                animate={{ opacity: hoveredIndex === index ? 0 : 1 }}
+                transition={{ duration: 0.1 }}
+              >
+                {letter}
+              </motion.span>
+              <motion.span
+                className="text-transparent bg-clip-text bg-cover bg-no-repeat"
+                animate={{
+                  opacity: hoveredIndex === index ? 1 : 0,
+                  backgroundPosition: hoveredIndex === index ? "10% center" : "0% center",
+                }}
+                transition={{
+                  opacity: { duration: 0.1 },
+                  backgroundPosition: { duration: 3, ease: "easeInOut" },
+                }}
+                style={{
+                  backgroundImage: `url('${letterImages[index % letterImages.length]}')`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
                 }}
               >
                 {letter}
               </motion.span>
-            )}
-          </motion.span>
+              {showRedText && (
+                <motion.span
+                  className={`absolute inset-0 ${overlayColor} pointer-events-none`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 1, 0] }}
+                  transition={{
+                    delay: index * overlayDelay,
+                    duration: overlayDuration,
+                    times: [0, 0.1, 0.7, 1],
+                    ease: "easeInOut",
+                  }}
+                >
+                  {letter}
+                </motion.span>
+              )}
+            </motion.span>
+          )
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
