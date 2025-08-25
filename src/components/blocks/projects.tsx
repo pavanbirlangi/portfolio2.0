@@ -14,7 +14,7 @@ export default function ProjectsSection() {
     // === Lenis integration ===
     // Get the global Lenis instance from your page.tsx setup
     const getLenisInstance = () => {
-      return (window as any).__lenis_instance;
+      return (window as unknown as { __lenis_instance: unknown }).__lenis_instance;
     };
 
     // Wait for Lenis to be available

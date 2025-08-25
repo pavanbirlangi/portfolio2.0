@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, useMemo, ReactNode, RefObject } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -25,29 +27,35 @@ interface ScrollRevealProps {
 
 const ScrollReveal: React.FC<ScrollRevealProps> = ({
   children,
-  scrollContainerRef,
   enableBlur = true,
   baseOpacity = 0.1,
   baseRotation = 3,
   blurStrength = 4,
   containerClassName = "",
   textClassName = "",
-  rotationEnd = "bottom bottom",
-  wordAnimationEnd = "bottom bottom",
 }) => {
   const containerRef = useRef<HTMLHeadingElement>(null);
 
+  // Pre-render with the "from" state to avoid flash-of-visible-text on first paint
   const splitText = useMemo(() => {
     const text = typeof children === "string" ? children : "";
     return text.split(/(\s+)/).map((word, index) => {
       if (word.match(/^\s+$/)) return word;
       return (
-        <span className="inline-block word" key={index}>
+        <span
+          className="inline-block word"
+          key={index}
+          style={{
+            opacity: baseOpacity,
+            filter: enableBlur ? `blur(${blurStrength}px)` : undefined,
+            willChange: "opacity, filter",
+          }}
+        >
           {word}
         </span>
       );
     });
-  }, [children]);
+  }, [children, baseOpacity, enableBlur, blurStrength]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -59,58 +67,59 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
     // Refresh ScrollTrigger to ensure it works with Lenis
     ScrollTrigger.refresh();
 
-    gsap.fromTo(
+    const rotationTween = gsap.fromTo(
       el,
       { transformOrigin: "0% 50%", rotate: baseRotation },
       {
-        ease: "power2.out", // Changed from "none" for smoother animation
+        ease: "power2.out",
         rotate: 0,
-        duration: 1, // Added duration for better control
+        duration: 1,
         scrollTrigger: {
           trigger: el,
           scroller,
-          start: "top 80%", // Start earlier for smoother experience
-          end: "top 20%", // Shorter animation range
-          scrub: 1, // Changed from true to 1 for smoother scrubbing
-          invalidateOnRefresh: true, // Important for Lenis
+          start: "top 80%",
+          end: "top 20%",
+          scrub: 1,
+          invalidateOnRefresh: true,
         },
       }
     );
 
     const wordElements = el.querySelectorAll<HTMLElement>(".word");
 
-    gsap.fromTo(
+    const opacityTween = gsap.fromTo(
       wordElements,
       { opacity: baseOpacity, willChange: "opacity, filter" },
       {
-        ease: "power2.out", // Smoother easing
+        ease: "power2.out",
         opacity: 1,
-        stagger: 0.03, // Reduced stagger for faster reveal
+        stagger: 0.03,
         scrollTrigger: {
           trigger: el,
           scroller,
-          start: "top 75%", // Start earlier
-          end: "top 25%", // Shorter range
-          scrub: 1, // Smoother scrubbing
+          start: "top 75%",
+          end: "top 25%",
+          scrub: 1,
           invalidateOnRefresh: true,
         },
       }
     );
 
+    let blurTween: gsap.core.Tween | null = null;
     if (enableBlur) {
-      gsap.fromTo(
+      blurTween = gsap.fromTo(
         wordElements,
         { filter: `blur(${blurStrength}px)` },
         {
-          ease: "power2.out", // Smoother easing
+          ease: "power2.out",
           filter: "blur(0px)",
-          stagger: 0.03, // Reduced stagger
+          stagger: 0.03,
           scrollTrigger: {
             trigger: el,
             scroller,
-            start: "top 75%", // Start earlier
-            end: "top 25%", // Shorter range
-            scrub: 1, // Smoother scrubbing
+            start: "top 75%",
+            end: "top 25%",
+            scrub: 1,
             invalidateOnRefresh: true,
           },
         }
@@ -118,7 +127,9 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
     }
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      rotationTween.scrollTrigger?.kill();
+      opacityTween.scrollTrigger?.kill();
+      blurTween?.scrollTrigger?.kill();
     };
   }, [
     enableBlur,
@@ -128,7 +139,11 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   ]);
 
   return (
-    <h2 ref={containerRef} className={`my-5 ${containerClassName}`}>
+    <h2
+      ref={containerRef}
+      className={`my-5 ${containerClassName}`}
+      style={{ transformOrigin: "0% 50%", transform: `rotate(${baseRotation}deg)` }}
+    >
       <p
         className={`text-[clamp(1.6rem,4vw,3rem)] leading-[1.5] font-semibold ${textClassName}`}
       >

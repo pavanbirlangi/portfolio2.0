@@ -93,7 +93,7 @@ export default function HeroScrollSection() {
     // === Lenis integration ===
     // Get the global Lenis instance from your page.tsx setup
     const getLenisInstance = () => {
-      return (window as any).__lenis_instance;
+      return (window as unknown as { __lenis_instance: unknown }).__lenis_instance;
     };
 
     // compute transform-origin for content container so scale is anchored on the center of 'J' in PROJECTS

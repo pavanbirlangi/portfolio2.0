@@ -37,7 +37,7 @@ const HorizontalScrollSection = () => {
       slider.style.overflowX = 'scroll';
       slider.style.overflowY = 'hidden';
       slider.style.scrollbarWidth = 'none'; // Firefox
-      (slider.style as any).msOverflowStyle = 'none'; // IE/Edge
+      (slider.style as { msOverflowStyle?: string }).msOverflowStyle = 'none'; // IE/Edge
       slider.style.scrollBehavior = 'smooth';
       
       // Prevent vertical scroll interference
@@ -74,11 +74,9 @@ const HorizontalScrollSection = () => {
       };
     } else {
       // Desktop: Use GSAP horizontal scroll animation
-      const firstCard = slider.querySelector('.scroll-card');
-      const cardWidth = firstCard ? (firstCard as HTMLElement).offsetWidth : 0;
       const totalWidth = slider.scrollWidth - window.innerWidth;
 
-      let horizontalScroll = gsap.to(slider, {
+      const horizontalScroll = gsap.to(slider, {
         x: -totalWidth,
         ease: 'none',
         scrollTrigger: {
@@ -102,7 +100,7 @@ const HorizontalScrollSection = () => {
     <div className="relative bg-transparent text-white mt-20">
       {/* SECTION HEADER */}
       <div className="container mx-auto px-6 pt-24 pb-12 md:pt-32 md:pb-16">
-        <h2 className="mb-4 text-5xl font-bold md:text-7xl">We're Known For</h2>
+        <h2 className="mb-4 text-5xl font-bold md:text-7xl">We&apos;re Known For</h2>
         <p className="max-w-xl text-lg text-neutral-300">
           Building high-performance websites that are specifically designed to
           showcase your unique style of work and boost client leads.

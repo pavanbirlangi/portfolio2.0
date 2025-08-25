@@ -43,7 +43,7 @@ export default function ProjectsHeroSection() {
     const whiteWash = whiteWashRef.current!;
 
     // === Enhanced Lenis integration for butter-smooth scrolling ===
-    const lenis = (window as any).lenis || (window as any).lenisInstance || (window as any).__lenis_instance;
+    const lenis = (window as unknown as { lenis?: unknown; lenisInstance?: unknown; __lenis_instance?: unknown }).lenis || (window as unknown as { lenis?: unknown; lenisInstance?: unknown; __lenis_instance?: unknown }).lenisInstance || (window as unknown as { lenis?: unknown; lenisInstance?: unknown; __lenis_instance?: unknown }).__lenis_instance;
     if (!lenis) {
       console.warn(
         "[ProjectsHeroSection] Lenis instance not found on window; ScrollTrigger syncing may degrade."
@@ -58,13 +58,13 @@ export default function ProjectsHeroSection() {
           return window.scrollY;
         }
         if (arguments.length && value !== undefined) {
-          if (typeof lenis.scrollTo === "function") {
-            lenis.scrollTo(value, { immediate: true });
+          if (lenis && typeof (lenis as { scrollTo?: (value: number, options?: { immediate: boolean }) => void }).scrollTo === "function") {
+            (lenis as { scrollTo: (value: number, options?: { immediate: boolean }) => void }).scrollTo(value, { immediate: true });
           } else {
             window.scrollTo(0, value);
           }
         }
-        return typeof lenis.scroll === "number" ? lenis.scroll : window.scrollY;
+        return lenis && typeof (lenis as { scroll?: number }).scroll === "number" ? (lenis as { scroll: number }).scroll : window.scrollY;
       },
       getBoundingClientRect() {
         return {
@@ -83,8 +83,8 @@ export default function ProjectsHeroSection() {
     };
     lenisScrollHandlerRef.current = lenisHandler;
     
-    if (lenis && typeof lenis.on === "function") {
-      lenis.on("scroll", lenisHandler);
+    if (lenis && typeof (lenis as { on?: (event: string, handler: () => void) => void }).on === "function") {
+      (lenis as { on: (event: string, handler: () => void) => void }).on("scroll", lenisHandler);
     } else {
       // Enhanced fallback with higher frequency updates
       let ticking = false;
@@ -160,15 +160,15 @@ export default function ProjectsHeroSection() {
       window.removeEventListener("resize", updateTransformOrigin);
       ctx.revert();
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      if (lenis && typeof lenis.off === "function" && lenisScrollHandlerRef.current) {
-        lenis.off("scroll", lenisScrollHandlerRef.current);
+      if (lenis && typeof (lenis as { off?: (event: string, handler: () => void) => void }).off === "function" && lenisScrollHandlerRef.current) {
+        (lenis as { off: (event: string, handler: () => void) => void }).off("scroll", lenisScrollHandlerRef.current);
       }
     };
   }, []);
 
   return (
     <section
-      ref={containerRef as any}
+      ref={containerRef}
       className="relative w-full min-h-screen overflow-hidden bg-black"
     >
       {/* Base dark gradient background */}
@@ -176,7 +176,7 @@ export default function ProjectsHeroSection() {
 
       {/* White wash overlay */}
       <div
-        ref={whiteWashRef as any}
+        ref={whiteWashRef}
         className="absolute inset-0 bg-white pointer-events-none"
         style={{ opacity: 0 }}
       />
@@ -187,7 +187,7 @@ export default function ProjectsHeroSection() {
           {/* Headline centered in viewport */}
           <div className="flex-1 flex items-center justify-center">
             <div
-              ref={headlineRef as any}
+              ref={headlineRef}
               className="text-white uppercase font-extrabold leading-[0.85] tracking-tight"
               style={{
                 fontSize: "clamp(4rem, 14vw, 12rem)",

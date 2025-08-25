@@ -14,8 +14,9 @@ const rightVariants = {
   show: { opacity: 1, x: 0, scale: 1, filter: 'drop-shadow(0 0 24px #00bcd4)' },
 };
 
-const ProfileImage = memo(() => (
-  <div className="flex justify-end items-center sm:p-12 sm:py-0 sm:pb-0 p-0 py-2 pb-2">
+const ProfileImage = memo(function ProfileImage() {
+  return (
+    <div className="flex justify-end items-center sm:p-12 sm:py-0 sm:pb-0 p-0 py-2 pb-2">
     <div className="relative group" data-aos="fade-up" data-aos-duration="1000">
       {/* Glassmorphism background effect */}
       <div className="absolute -inset-6 z-0 hidden sm:block pointer-events-none flex items-center justify-center">
@@ -41,7 +42,8 @@ const ProfileImage = memo(() => (
       </div>
     </div>
   </div>
-));
+    );
+  });
 
 export default function About() {
   return (
@@ -71,7 +73,7 @@ export default function About() {
               containerClassName="mb-2 text-left"
               textClassName="text-gray-300 text-lg md:text-xl"
             >
-              Hello, I'm
+              Hello, I&apos;m
             </ScrollReveal>
             
             <ScrollReveal
@@ -93,7 +95,7 @@ export default function About() {
               containerClassName="max-w-xl mx-auto md:mx-0 mb-8 text-left"
               textClassName="font-sans text-gray-400 text-lg md:text-xl"
             >
-              I'm a freelance web developer and Shopify expert, specializing in eCommerce and custom web solutions. From sleek Shopify stores to dynamic websites, I create seamless, high-converting user experiences.
+              I&apos;m a freelance web developer and Shopify expert, specializing in eCommerce and custom web solutions. From sleek Shopify stores to dynamic websites, I create seamless, high-converting user experiences.
             </ScrollReveal>
 
             <motion.div 

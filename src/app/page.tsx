@@ -1,21 +1,19 @@
 "use client";
-import { motion } from "framer-motion";
 import Hero from "@/components/Hero";
-import { useState, useEffect } from "react"; // Added useEffect
+import { useState, useEffect } from "react";
 import Loader from "@/components/Loader";
 import About from "@/components/About";
 import HorizontalScrollSection from "@/components/ui/horizontal-scroll-section";
 import { Marquee } from "@/components/demo-marquee";
-import Lenis from '@studio-freight/lenis'; // Import Lenis
-import { ContainerScroll, CardSticky } from "@/components/blocks/cards-stack"
-import  { Process } from "@/components/process"
+import Lenis from '@studio-freight/lenis';
+import { Process } from "@/components/process"
 import HeroScrollSection from "@/components/blocks/text-rise"
 import HeroScrollAnimation from "@/components/ui/hero-scroll-animation"
 
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
-  const [lenis, setLenis] = useState<Lenis | null>(null);
+  const [, setLenis] = useState<Lenis | null>(null);
 
   // Initialize Lenis for smooth scrolling
   useEffect(() => {
@@ -30,7 +28,7 @@ export default function Home() {
     setLenis(lenisInstance);
 
     // Expose Lenis instance globally for other components
-    (window as any).__lenis_instance = lenisInstance;
+    (window as unknown as { __lenis_instance: Lenis }).__lenis_instance = lenisInstance;
 
     function raf(time: number) {
       lenisInstance.raf(time);
@@ -40,8 +38,8 @@ export default function Home() {
 
     // Update ScrollTrigger when Lenis updates (if available)
     lenisInstance.on('scroll', () => {
-      if (typeof window !== 'undefined' && (window as any).ScrollTrigger) {
-        (window as any).ScrollTrigger.update();
+      if (typeof window !== 'undefined' && (window as unknown as { ScrollTrigger: unknown }).ScrollTrigger) {
+        (window as unknown as { ScrollTrigger: { update: () => void } }).ScrollTrigger.update();
       }
     });
 
@@ -49,7 +47,7 @@ export default function Home() {
       lenisInstance.destroy();
       setLenis(null);
       // Clean up global reference
-      delete (window as any).__lenis_instance;
+      (window as unknown as { __lenis_instance?: Lenis }).__lenis_instance = undefined;
     };
   }, []);
 

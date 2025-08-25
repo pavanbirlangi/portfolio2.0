@@ -79,7 +79,7 @@ export default function ProjectsStackSection({
     );
 
     // === Lenis integration ===
-    const lenis = (window as any).lenis || (window as any).lenisInstance;
+    const lenis = (window as unknown as { lenis?: unknown; lenisInstance?: unknown }).lenis || (window as unknown as { lenis?: unknown; lenisInstance?: unknown }).lenisInstance;
     if (!lenis) {
       console.warn(
         "[ProjectsStackSection] Lenis instance not found on window; ScrollTrigger might not sync perfectly."
@@ -94,13 +94,13 @@ export default function ProjectsStackSection({
           return window.scrollY;
         }
         if (arguments.length && typeof value === "number") {
-          if (typeof lenis.scrollTo === "function") {
-            lenis.scrollTo(value, { immediate: true });
+          if (lenis && typeof (lenis as { scrollTo?: (value: number, options?: { immediate: boolean }) => void }).scrollTo === "function") {
+            (lenis as { scrollTo: (value: number, options?: { immediate: boolean }) => void }).scrollTo(value, { immediate: true });
           } else {
             window.scrollTo(0, value);
           }
         }
-        return typeof lenis.scroll === "number" ? lenis.scroll : window.scrollY;
+        return lenis && typeof (lenis as { scroll?: number }).scroll === "number" ? (lenis as { scroll: number }).scroll : window.scrollY;
       },
       getBoundingClientRect() {
         return {
@@ -117,10 +117,10 @@ export default function ProjectsStackSection({
       ScrollTrigger.update();
     };
     lenisHandlerRef.current = lenisHandler;
-    if (lenis && typeof lenis.on === "function") {
-      lenis.on("scroll", lenisHandler);
+    if (lenis && typeof (lenis as { on?: (event: string, handler: () => void) => void }).on === "function") {
+      (lenis as { on: (event: string, handler: () => void) => void }).on("scroll", lenisHandler);
     } else {
-      const raf = (time: number) => {
+      const raf = () => {
         ScrollTrigger.update();
         requestAnimationFrame(raf);
       };
@@ -182,21 +182,21 @@ export default function ProjectsStackSection({
     return () => {
       ctx.revert();
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      if (lenis && typeof lenis.off === "function" && lenisHandlerRef.current) {
-        lenis.off("scroll", lenisHandlerRef.current);
+      if (lenis && typeof (lenis as { off?: (event: string, handler: () => void) => void }).off === "function" && lenisHandlerRef.current) {
+        (lenis as { off: (event: string, handler: () => void) => void }).off("scroll", lenisHandlerRef.current);
       }
     };
   }, [projects]);
 
   return (
     <section
-      ref={containerRef as any}
+      ref={containerRef}
       className="relative w-full bg-transparent"
       style={{ minHeight: `${projects.length * 120}vh` }} // enough scroll space
     >
       <div className="max-w-[1400px] mx-auto py-32 px-6">
         <div
-          ref={cardsWrapperRef as any}
+          ref={cardsWrapperRef}
           className="relative h-[80vh] flex items-center"
           style={{ perspective: "1400px" }}
         >

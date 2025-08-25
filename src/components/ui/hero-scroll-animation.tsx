@@ -2,7 +2,6 @@
 
 import { useScroll, useTransform, motion, MotionValue } from 'motion/react';
 import React, { useRef, forwardRef, useEffect } from 'react';
-import Image from 'next/image';
 import SpotlightCard from '@/components/blocks/spotlight-card';
 import { RevealText } from '@/components/blocks/video-text';
 
@@ -142,7 +141,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
                 transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
                 viewport={{ once: true, amount: 0.1 }}
               >
-                Let's make it real.
+                Let&apos;s make it real.
               </motion.p>
             </div>
           </motion.div>
@@ -151,16 +150,16 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
             onClick={() => {
               console.log('Button clicked'); // Debug log
               try {
-                // @ts-ignore
+                // @ts-expect-error - Cal.com global object
                 if (typeof window !== 'undefined' && window.Cal) {
                   console.log('Cal found, opening modal'); // Debug log
-                  // @ts-ignore
+                  // @ts-expect-error - Cal.com global object
                   window.Cal('ui', {
                     "styles":{"branding":{"color":"#292929"}},
                     "hideEventTypeDetails":false,
                     "layout":"month_view"
                   });
-                  // @ts-ignore
+                  // @ts-expect-error - Cal.com global object
                   window.Cal('openModal', 'devcapo/15min');
                 } else {
                   console.log('Cal not found, redirecting to Cal.com'); // Debug log
@@ -174,7 +173,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
             }}
             className="group relative px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 rounded-full text-lg font-semibold text-white transition-all duration-300 hover:scale-105"
           >
-            <span className="relative z-10">Let's Talk</span>
+            <span className="relative z-10">Let&apos;s Talk</span>
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
         </div>
@@ -183,7 +182,7 @@ const Section2: React.FC<SectionProps> = ({ scrollYProgress }) => {
   );
 };
 
-const Component = forwardRef<HTMLElement>((props, ref) => {
+const Component = forwardRef<HTMLElement>(() => {
   const container = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLElement>(null);
   
@@ -217,11 +216,11 @@ const Component = forwardRef<HTMLElement>((props, ref) => {
     
     script.onload = () => {
       console.log('Cal.com script loaded successfully');
-      try {
-        // @ts-ignore
-        if (typeof window !== 'undefined' && window.Cal) {
-          // @ts-ignore
-          window.Cal('init', {origin:"https://cal.com"});
+              try {
+          // @ts-expect-error - Cal.com global object
+          if (typeof window !== 'undefined' && window.Cal) {
+            // @ts-expect-error - Cal.com global object
+            window.Cal('init', {origin:"https://cal.com"});
           console.log('Cal.com initialized');
         }
       } catch (error) {

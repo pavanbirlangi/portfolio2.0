@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { FaGithub, FaLinkedin, FaEnvelope, FaTwitter } from 'react-icons/fa';
 import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text';
-import { url } from 'inspector';
+
 
 // Animation variants
 const containerVariants = {
@@ -31,10 +31,7 @@ const descVariants = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0 },
 };
-const buttonVariants = {
-  hidden: { opacity: 0, scale: 0.8, y: 30 },
-  show: { opacity: 1, scale: 1, y: 0 },
-};
+
 const socialVariants = {
   hidden: { opacity: 0, scale: 0.7, y: 20 },
   show: { opacity: 1, scale: 1, y: 0 },
