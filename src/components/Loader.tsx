@@ -13,6 +13,8 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
   const [showPercentage, setShowPercentage] = useState(true);
 
   const percentageRef = useRef(0);
+  const panelsDoneRef = useRef(0);
+  const panelsCompletedRef = useRef(false);
 
   const baseDuration = 3500; // bar animation time
   const randomDelay = Math.random() * 0.5 + 0.2;
@@ -38,19 +40,8 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
         setShowPercentage(false);
         setShowSplit(true);
 
-        setTimeout(() => {
-          setFadeBackground(true);
-
-          setTimeout(() => {
-            setHideLine(true);
-
-            setTimeout(() => {
-              setLoading(false);
-              onFinish();
-            }, 400); // Reduced from 600ms to 300ms
-          }, 600); // Reduced from 1000ms to 400ms
-        }, 180); // Reduced from 300ms to 150ms
-      }, 500); // Reduced from 500ms to 200ms
+        // Do not rely on timeouts; wait for both panels' animation to complete
+      }, 500);
     }, totalDuration);
 
     return () => {
@@ -68,10 +59,10 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
         <motion.div
           className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto"
           initial={{ opacity: 1 }}
-          animate={{ opacity: fadeBackground ? 0 : 1 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.3 } }}
           transition={{ duration: 0.3 }}
-          style={{ backgroundColor: fadeBackground ? "transparent" : "white" }}
+          style={{ backgroundColor: (showSplit || fadeBackground) ? "transparent" : "white" }}
         >
           {/* Loading Bar */}
           <motion.div
@@ -105,12 +96,34 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
                 initial={{ y: 0 }}
                 animate={{ y: "-100vh" }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
+                onAnimationComplete={() => {
+                  panelsDoneRef.current += 1;
+                  if (panelsDoneRef.current >= 2 && !panelsCompletedRef.current) {
+                    panelsCompletedRef.current = true;
+                    setHideLine(true);
+                    setTimeout(() => {
+                      setLoading(false);
+                      onFinish();
+                    }, 100);
+                  }
+                }}
               />
               <motion.div
                 className="fixed left-0 right-0 bottom-0 h-1/2 bg-white z-[10000]"
                 initial={{ y: 0 }}
                 animate={{ y: "100vh" }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
+                onAnimationComplete={() => {
+                  panelsDoneRef.current += 1;
+                  if (panelsDoneRef.current >= 2 && !panelsCompletedRef.current) {
+                    panelsCompletedRef.current = true;
+                    setHideLine(true);
+                    setTimeout(() => {
+                      setLoading(false);
+                      onFinish();
+                    }, 100);
+                  }
+                }}
               />
             </>
           )}
