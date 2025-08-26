@@ -8,7 +8,6 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
   const [showSplit, setShowSplit] = useState(false);
   const [barFull, setBarFull] = useState(false);
   const [hideLine, setHideLine] = useState(false);
-  const [fadeBackground, setFadeBackground] = useState(false);
   const [percentage, setPercentage] = useState(0);
   const [showPercentage, setShowPercentage] = useState(true);
 
@@ -62,7 +61,7 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.3 } }}
           transition={{ duration: 0.3 }}
-          style={{ backgroundColor: (showSplit || fadeBackground) ? "transparent" : "white" }}
+          style={{ backgroundColor: showSplit ? "transparent" : "white" }}
         >
           {/* Loading Bar */}
           <motion.div
