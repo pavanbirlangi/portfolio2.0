@@ -585,7 +585,7 @@ export default function HeroScrollSection() {
                           </div>
                           <div className="flex-1 min-h-0">
                             <h3 className="text-lg md:text-xl font-bold tracking-tight mb-1 text-white line-clamp-2">{project.title}</h3>
-                            <p className="text-sm md:text-base text-white/70 leading-relaxed line-clamp-3">{project.shortDescription}</p>
+                            <p className="text-xs md:text-sm text-white/70 leading-tight line-clamp-3">{project.shortDescription}</p>
                           </div>
                         </div>
                       </div>
