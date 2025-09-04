@@ -558,8 +558,8 @@ export default function HeroScrollSection() {
                   )}
                   style={{
                     zIndex: idx + 10,
-                    width: "min(540px, calc(100vw - 2rem))",
-                    height: "min(500px, 55vh)",
+                    width: "min(480px, calc(100vw - 2rem))",
+                    height: "min(440px, 50vh)",
                     transform: `translate(${idx * 120}px, ${idx * 60}px)`,
                     willChange: "transform, opacity",
                     isolation: "isolate",
