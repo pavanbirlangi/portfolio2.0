@@ -201,8 +201,12 @@ export default function Home() {
       {!loaded && <Loader onFinish={() => setLoaded(true)} />}
       {loaded && (
         <main className="bg-black text-white-800">
-          <Hero />
-          <About />
+          <section id="home">
+            <Hero />
+          </section>
+          <section id="about">
+            <About />
+          </section>
           <Marquee baseSpeed={80} gap="5rem">
             {arr.map((Logo, index) => (
               <div
@@ -213,12 +217,18 @@ export default function Home() {
               </div>
             ))}
           </Marquee>
-          <HorizontalScrollSection />
+          <section id="blogs">
+            <HorizontalScrollSection />
+          </section>
           {/* Pass the lenis instance and a gap to the Marquee */}
 
           <Process />
-          <HeroScrollSection />
-          <HeroScrollAnimation />
+          <section id="projects">
+            <HeroScrollSection />
+          </section>
+          <section id="contact">
+            <HeroScrollAnimation />
+          </section>
 
           {/* Removed the duplicate About component from here */}
         </main>

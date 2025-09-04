@@ -3,33 +3,33 @@ import { ContainerScroll, CardSticky } from "@/components/blocks/cards-stack"
 const PROCESS_PHASES = [
   {
     id: "process-1",
-    title: "Research and Analysis",
+    title: "Frontend Development",
     description:
-      "With your vision in mind, we enter the Research and Analysis phase. Here, we examine your competitors, industry trends, and user preferences. This informed approach ensures your website stands out and provides an excellent user experience.",
+      "Using frameworks like React and Next.js, I create responsive, sleek, and highly interactive interfaces. Every detail, from transitions to accessibility, is designed to improve the user experience.",
   },
   {
     id: "process-2",
-    title: "Wireframing and Prototyping",
+    title: "Backend Systems",
     description:
-      "We move on to Wireframing and Prototyping, where we create skeletal representations of your website's pages. These visual indigoprints allow us to test and refine the user experience before diving into design.",
+      "I build strong foundations with Node.js and Express. APIs, authentication, and performance optimizations are crafted to support real-world applications at scale with speed and security in mind.",
   },
   {
     id: "process-3",
-    title: "Design Creation",
+    title: "Databases That Scale",
     description:
-      "Now, it's time for the Design Creation phase. Our talented designers bring your vision to life. We focus on aesthetics, ensuring your website not only looks stunning but also aligns perfectly with your brand identity.",
+      "With experience in MongoDB and PostgreSQL, I design database architectures that can handle growing amounts of data. Each schema is optimized for performance, reliability, and easy future expansion.",
   },
   {
     id: "process-4",
-    title: "Development and Testing",
+    title: "Cloud & Deployment",
     description:
-      "In the Development and Testing phase, our skilled developers turn designs into a fully functional website. Rigorous testing ensures everything works seamlessly, providing an exceptional user experience.",
+      "AWS, Docker, and CI/CD pipelines ensure smooth deployments and reliable hosting. This means projects remain stable, resilient, and accessible across all devices.",
   },
   {
     id: "process-5",
-    title: "Launch and Support",
+    title: "AI & Integrations",
     description:
-      "Our commitment continues beyond launch. We offer post-launch support to address questions, provide assistance, and ensure your website remains updated and optimized. The Website Design Process isn't just about creating a website; it's about crafting a digital experience that resonates, engages, and converts.",
+      "From OpenAI-powered insights to API-driven automation, I integrate smart tools into products. This opens doors to innovation while keeping solutions practical and business-ready.",
   },
 ]
 
@@ -38,16 +38,14 @@ const Process = () => {
     <div className="container min-h-svh place-content-center bg-transparent px-6 pb-24 text-gray-300 xl:px-12">
       <div className="grid md:grid-cols-2 md:gap-8 xl:gap-12">
         <div className="left-0 top-0 md:sticky md:top-24 md:h-fit md:py-12">
-          <h5 className="text-xs uppercase tracking-wide font-sans">our process</h5>
-          <h2 className="mb-6 mt-4 text-4xl font-bold tracking-tight font-fira">
-            Planning your{" "}
-            <span className="text-indigo-500">project development</span> journey
+          <h5 className="text-xs md:text-sm uppercase tracking-wide font-sans">The Tools I Trust</h5>
+          <h2 className="mb-6 mt-4 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight font-fira">
+            A modern toolkit that helps me build projects
           </h2>
-          <p className="max-w-prose text-sm font-sans">
-            Our journey begins with a deep dive into your vision. In the
-            Discovery phase, we engage in meaningful conversations to grasp your
-            brand identity, goals, and the essence you want to convey. This
-            phase sets the stage for all that follows.
+          <p className="max-w-prose text-base md:text-lg font-sans">
+          Building great products requires more than just creativity — it requires the right set of tools.
+From frontend frameworks to cloud deployment, I rely on a modern, battle-tested stack that ensures
+speed, scalability, and reliability for every project I work on.
           </p>
         </div>
         <ContainerScroll className="min-h-[400vh] space-y-8 py-12">
@@ -55,18 +53,19 @@ const Process = () => {
             <CardSticky
               key={phase.id}
               index={index + 2}
+              incrementY={30}
               className="rounded-2xl border p-8 shadow-md backdrop-blur-md"
             >
               <div className="flex items-center justify-between gap-4">
-                <h2 className="my-6 text-2xl font-bold tracking-tighter font-fira">
+                <h2 className="my-6 text-xl md:text-2xl lg:text-3xl font-bold tracking-tighter font-fira">
                   {phase.title}
                 </h2>
-                <h3 className="text-2xl font-bold text-indigo-500 font-fira">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-400 font-fira">
                   {String(index + 1).padStart(2, "0")}
                 </h3>
               </div>
 
-              <p className="text-gray-300 font-sans">{phase.description}</p>
+              <p className="text-gray-300 font-sans text-sm md:text-base leading-relaxed">{phase.description}</p>
             </CardSticky>
           ))}
         </ContainerScroll>

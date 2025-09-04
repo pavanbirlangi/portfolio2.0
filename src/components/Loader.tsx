@@ -39,7 +39,18 @@ export default function Loader({ onFinish }: { onFinish: () => void }) {
         setShowPercentage(false);
         setShowSplit(true);
 
-        // Do not rely on timeouts; wait for both panels' animation to complete
+        // Failsafe: if panel animations don't report completion within 2s, finish anyway
+        const failSafe = setTimeout(() => {
+          if (!panelsCompletedRef.current) {
+            panelsCompletedRef.current = true;
+            setHideLine(true);
+            setLoading(false);
+            onFinish();
+          }
+        }, 2000);
+
+        // Clear failsafe when unmounting
+        return () => clearTimeout(failSafe);
       }, 500);
     }, totalDuration);
 
