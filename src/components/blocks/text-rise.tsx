@@ -29,9 +29,9 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
       "Full‑stack booking platform for institutions. Filter by preferences, pay via Razorpay, and receive PDF receipts. Admins manage categories, listings, and bookings from a powerful dashboard.",
     longDescription:
       "Guardiann is a full-stack React + Express.js platform designed to simplify the search and booking process for institutions such as schools, colleges, and PGs. It enables users to filter by preferences, securely pay via Razorpay integration, and instantly receive auto-generated PDF receipts. The admin dashboard offers powerful tools for managing categories, listings, and bookings with ease. Optimized for performance, Guardiann streamlines the entire journey from discovery to payment. Whether for students finding the right institution or admins managing data, Guardiann delivers a reliable, intuitive, and professional digital booking experience.",
-    image: "/images/img_1.png",
-    codeUrl: "#",
-    viewUrl: "#",
+    image: "/images/guardiann1.png",
+    codeUrl: "https://github.com/pavanbirlangi/Guardiann-dev",
+    viewUrl: "https://guardiann.in/",
   },
   {
     id: "p2",
@@ -40,9 +40,9 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
       "AI web app that turns long video lectures into concise, test-ready notes. Whisper for transcripts, T5/BART for summaries, and LLMs for quizzes and flashcards.",
     longDescription:
       "MindVault is an AI-powered web app that transforms lengthy video lectures into concise, test-ready study material. Built with React, Node.js, and OpenRouter APIs, it integrates Whisper for speech-to-text, T5-small/BART for summarization, and advanced LLMs for generating quizzes and flashcards. Students can upload lectures, view accurate transcripts, explore structured summaries, and practice with automatically generated questions—all within a sleek, interactive dashboard. Designed for students and lifelong learners, MindVault turns unstructured video content into clear, engaging, and digestible notes, making revision faster, smarter, and more effective.",
-    image: "/images/img_2.png",
-    codeUrl: "#",
-    viewUrl: "#",
+    image: "/images/mind_vault.png",
+    codeUrl: "https://github.com/pavanbirlangi/Smart-Notes-Maker",
+    viewUrl: "https://github.com/pavanbirlangi/Smart-Notes-Maker",
   },
   {
     id: "p3",
@@ -51,9 +51,9 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
       "Custom Shopify storefront for luxury jewelry. Premium theme, optimized catalogs, responsive design, and a conversion-focused checkout experience.",
     longDescription:
       "Aethel Jewelry is a custom Shopify-powered online store designed for luxury jewelry brands. With premium theme customization, optimized product catalogs, and a conversion-focused checkout flow, it delivers an elegant shopping experience that mirrors the sophistication of the products. The store balances aesthetics with performance, offering responsive design across devices and smooth navigation for customers. On the backend, it ensures scalability and easy management for store owners. Aethel Jewelry embodies a perfect blend of visual appeal, usability, and technical efficiency, helping brands establish a polished digital presence while boosting online sales.",
-    image: "/images/img_3.png",
+    image: "/images/aethel.png",
     codeUrl: "#",
-    viewUrl: "#",
+    viewUrl: "https://aethel-jewelry.myshopify.com/",
   },
   {
     id: "p4",
@@ -62,7 +62,7 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
       "Personal finance + productivity hub with an AI assistant. Track expenses, tasks, and goals in a sleek, glassmorphic Next.js dashboard.",
     longDescription:
       "Vortex AI is a futuristic personal finance and productivity platform built using Next.js, Node.js, and OpenRouter AI. It combines expense tracking, task management, goal-setting, and an AI assistant into one cohesive dashboard. Users can interact with an intelligent chatbot to gain real-time financial insights, manage daily tasks, and simplify decision-making. With a sleek, Apple-inspired design enhanced by glassmorphism and smooth animations, Vortex AI feels modern, intuitive, and engaging. Built for everyday users who want a single hub to manage both productivity and money, Vortex AI transforms complexity into clarity with AI-driven assistance.",
-    image: "/images/img_4.png",
+    image: "/images/Vortex.png",
     codeUrl: "#",
     viewUrl: "#",
   },
@@ -73,9 +73,9 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
       "Instant portfolio/profile generator with Next.js + PostgreSQL. Create shareable profiles with projects, skills, and experience in minutes.",
     longDescription:
       "PRFL is a streamlined portfolio/profile generator built with Next.js and PostgreSQL, aimed at freelancers and developers who want to showcase their work instantly. It allows users to create dynamic, shareable profiles with sections for skills, projects, and experience—without the need for manual coding or design. With its lightweight architecture and clean UI, PRFL makes creating a professional online presence as easy as filling out a form. The platform is designed for speed, simplicity, and elegance, empowering individuals to put their best foot forward in just minutes.",
-    image: "/images/img_5.png",
-    codeUrl: "#",
-    viewUrl: "#",
+    image: "/images/PRFL.png",
+    codeUrl: "https://github.com/pavanbirlangi/DevConnect",
+    viewUrl: "https://prfl.live/",
   },
   {
     id: "p6",
@@ -84,9 +84,9 @@ const SAMPLE_PROJECTS: ProjectItem[] = [
       "Developer collaboration platform with projects, messaging, and collaborator matching. Build, network, and grow together.",
     longDescription:
       "DevConnect is a collaboration platform for developers, built with React and Supabase. It enables users to post projects, apply as collaborators, and connect with peers to work on real-world software ideas. Key features include a project feed with likes and comments, a messaging system for real-time collaboration, resume uploads for project applications, and a collaborator-matching workflow where project owners can accept or reject applicants. Additionally, users can send and manage connection requests, track their applied projects via a personal dashboard, and showcase their work. DevConnect creates an ecosystem where developers can network, build, and grow together.",
-    image: "/images/QR-Code.png",
-    codeUrl: "#",
-    viewUrl: "#",
+    image: "/images/Devconnect1.png",
+    codeUrl: "https://github.com/pavanbirlangi/DevConnect",
+    viewUrl: "https://mydevconnect.netlify.app/",
   },
 ];
 
